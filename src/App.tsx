@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import SOSButton from "./components/SOSButton";
 import WelcomePopup from "./components/WelcomePopup";
+import HealthChatbot from "./components/HealthChatbot";
 import Home from "./pages/Home";
 import Education from "./pages/Education";
 import Healthcare from "./pages/Healthcare";
@@ -38,6 +39,7 @@ const App = () => (
           </main>
           <SOSButton />
           <WelcomePopup />
+          <HealthChatbot />
         </div>
       </BrowserRouter>
     </TooltipProvider>
