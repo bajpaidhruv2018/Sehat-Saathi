@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Heart, BookOpen, MapPin, Users, Smartphone, Shield, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import FeatureCard from "@/components/FeatureCard";
 import heroImage from "@/assets/rural-healthcare.jpg";
 import communityImage from "@/assets/healthcare-clinic.jpg";
 import elderImage from "@/assets/mobile-clinic.jpg";
@@ -111,77 +112,47 @@ const Home = () => {
           </div>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
-            <Card className="border-2 hover:border-primary hover:shadow-medium transition-all duration-300 rounded-xl">
-              <CardContent className="pt-6 space-y-4">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <BookOpen className="w-6 h-6 text-primary" />
-                </div>
-                <h3 className="font-heading text-xl font-semibold">Health Education</h3>
-                <p className="text-muted-foreground">
-                  Learn about hygiene, vaccinations, nutrition, and preventing common diseases in simple, visual guides.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-2 hover:border-primary hover:shadow-medium transition-all duration-300 rounded-xl">
-              <CardContent className="pt-6 space-y-4">
-                <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center">
-                  <Smartphone className="w-6 h-6 text-secondary" />
-                </div>
-                <h3 className="font-heading text-xl font-semibold">Digital Literacy</h3>
-                <p className="text-muted-foreground">
-                  Easy tutorials on booking appointments online, reading digital prescriptions, and using health apps.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-2 hover:border-primary hover:shadow-medium transition-all duration-300 rounded-xl">
-              <CardContent className="pt-6 space-y-4">
-                <div className="w-12 h-12 rounded-xl bg-accent-foreground/10 flex items-center justify-center">
-                  <MapPin className="w-6 h-6 text-accent-foreground" />
-                </div>
-                <h3 className="font-heading text-xl font-semibold">Find Healthcare</h3>
-                <p className="text-muted-foreground">
-                  Locate nearby hospitals, clinics, and pharmacies. Connect with doctors through chat or video.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-2 hover:border-primary hover:shadow-medium transition-all duration-300 rounded-xl">
-              <CardContent className="pt-6 space-y-4">
-                <div className="w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center">
-                  <Shield className="w-6 h-6 text-secondary" />
-                </div>
-                <h3 className="font-heading text-xl font-semibold">Emergency Help</h3>
-                <p className="text-muted-foreground">
-                  Quick access to emergency numbers and nearby emergency facilities when every second counts.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-2 hover:border-primary hover:shadow-medium transition-all duration-300 rounded-xl">
-              <CardContent className="pt-6 space-y-4">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <Users className="w-6 h-6 text-primary" />
-                </div>
-                <h3 className="font-heading text-xl font-semibold">Offline Access</h3>
-                <p className="text-muted-foreground">
-                  Once you've opened any section, the information saves on your device and works without internet.
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-2 hover:border-primary hover:shadow-medium transition-all duration-300 rounded-xl">
-              <CardContent className="pt-6 space-y-4">
-                <div className="w-12 h-12 rounded-xl bg-accent-foreground/10 flex items-center justify-center">
-                  <Heart className="w-6 h-6 text-accent-foreground" />
-                </div>
-                <h3 className="font-heading text-xl font-semibold">Voice Support</h3>
-                <p className="text-muted-foreground">
-                  Use voice search and navigation for those who find typing difficult or are still learning.
-                </p>
-              </CardContent>
-            </Card>
+            <FeatureCard
+              icon={BookOpen}
+              title="Health Education"
+              description="Learn about hygiene, vaccinations, nutrition, and preventing common diseases in simple, visual guides."
+              iconBgClass="bg-primary/10 text-primary"
+            />
+            
+            <FeatureCard
+              icon={Smartphone}
+              title="Digital Literacy"
+              description="Easy tutorials on booking appointments online, reading digital prescriptions, and using health apps."
+              iconBgClass="bg-secondary/10 text-secondary"
+            />
+            
+            <FeatureCard
+              icon={MapPin}
+              title="Find Healthcare"
+              description="Locate nearby hospitals, clinics, and pharmacies. Connect with doctors through chat or video."
+              iconBgClass="bg-accent-foreground/10 text-accent-foreground"
+            />
+            
+            <FeatureCard
+              icon={Shield}
+              title="Emergency Help"
+              description="Quick access to emergency numbers and nearby emergency facilities when every second counts."
+              iconBgClass="bg-secondary/10 text-secondary"
+            />
+            
+            <FeatureCard
+              icon={Users}
+              title="Offline Access"
+              description="Once you've opened any section, the information saves on your device and works without internet."
+              iconBgClass="bg-primary/10 text-primary"
+            />
+            
+            <FeatureCard
+              icon={Heart}
+              title="Voice Support"
+              description="Use voice search and navigation for those who find typing difficult or are still learning."
+              iconBgClass="bg-accent-foreground/10 text-accent-foreground"
+            />
           </div>
         </div>
       </section>
