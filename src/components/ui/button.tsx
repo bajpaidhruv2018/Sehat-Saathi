@@ -44,7 +44,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const [magneticStyle, setMagneticStyle] = React.useState({});
     const [spotlightStyle, setSpotlightStyle] = React.useState({});
     const buttonRef = React.useRef<HTMLButtonElement>(null);
-    const isMagnetic = variant !== "destructive" && !props.disabled;
+    const isMagnetic = variant !== "destructive" && !props.disabled && !asChild;
 
     const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
       if (!isMagnetic || window.innerWidth < 768) return;
@@ -80,6 +80,13 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     React.useImperativeHandle(ref, () => buttonRef.current!);
 
     const Comp = asChild ? Slot : "button";
+    
+    if (asChild) {
+      return (
+        <Comp className={cn(buttonVariants({ variant, size, className }))} ref={buttonRef} {...props} />
+      );
+    }
+    
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
