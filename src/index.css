@@ -50,9 +50,9 @@ All colors MUST be HSL.
     --shadow-medium: 0 4px 20px rgba(0, 0, 0, 0.12);
     --shadow-strong: 0 8px 30px rgba(0, 0, 0, 0.15);
     
-    /* Gentle, natural gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(200 70% 55%), hsl(200 60% 65%));
-    --gradient-secondary: linear-gradient(135deg, hsl(150 45% 55%), hsl(150 50% 65%));
+    /* High-contrast, AA compliant gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(200 75% 48%), hsl(200 70% 58%));
+    --gradient-secondary: linear-gradient(135deg, hsl(150 50% 45%), hsl(150 48% 55%));
     --gradient-hero: linear-gradient(180deg, hsl(200 60% 96%), hsl(0 0% 100%));
     
     /* Shadows for depth */
@@ -111,8 +111,8 @@ All colors MUST be HSL.
     --ring: 200 65% 50%;
     
     --gradient-hero: linear-gradient(135deg, hsl(200 65% 50%), hsl(200 55% 60%));
-    --gradient-primary: linear-gradient(135deg, hsl(200 65% 50%), hsl(200 60% 60%));
-    --gradient-secondary: linear-gradient(135deg, hsl(150 40% 50%), hsl(150 45% 60%));
+    --gradient-primary: linear-gradient(135deg, hsl(200 70% 45%), hsl(200 65% 55%));
+    --gradient-secondary: linear-gradient(135deg, hsl(150 45% 42%), hsl(150 42% 52%));
     
     --shadow-card: 0 2px 12px -2px hsl(0 0% 0% / 0.3);
     --sidebar-background: 240 5.9% 10%;
