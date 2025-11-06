@@ -16,10 +16,10 @@ const Home = () => {
           <div className="grid gap-12 lg:grid-cols-2 lg:gap-8 items-center">
             <div className="space-y-6 animate-fade-in">
               <h1 className="font-heading text-4xl font-bold leading-tight text-foreground sm:text-5xl md:text-6xl">
-                Healthcare Shouldn't Depend on Distance
+                Your Family Compounder - SehatSaathi
               </h1>
               <p className="text-lg text-muted-foreground md:text-xl max-w-xl">
-                A simple app that helps people in rural areas access health information, learn about digital health tools, and find nearby healthcare services—even on slow internet.
+                Sehat Saathi is like your that relative who has got those clutch connections to help you in different fields of human endeavour when all hope is lost.
               </p>
               <div className="flex flex-col gap-4 sm:flex-row">
                 <Button asChild size="lg" className="rounded-xl shadow-medium hover:shadow-strong transition-all">
@@ -36,64 +36,6 @@ const Home = () => {
                 alt="Healthcare worker helping rural community" 
                 className="rounded-2xl shadow-strong w-full h-auto object-cover"
               />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Problem Section */}
-      <section className="py-16 bg-background">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center space-y-6">
-            <h2 className="font-heading text-3xl font-bold text-foreground sm:text-4xl">
-              The Reality We're Facing
-            </h2>
-            <p className="text-lg text-muted-foreground leading-relaxed">
-              In many rural areas, the nearest hospital is hours away. Simple questions like "Is this fever serious?" or "When should my child get vaccinated?" go unanswered. 
-              Many people don't know how to book appointments online or understand their prescriptions. Access to healthcare shouldn't be this hard.
-            </p>
-            <div className="pt-4">
-              <blockquote className="italic text-xl text-primary font-medium border-l-4 border-primary pl-6">
-                "No one should lack healthcare because of distance."
-              </blockquote>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Solution Section */}
-      <section className="py-16 bg-accent">
-        <div className="container mx-auto px-4">
-          <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
-            <div className="order-2 lg:order-1">
-              <img 
-                src={communityImage} 
-                alt="Community learning together" 
-                className="rounded-2xl shadow-medium w-full h-auto object-cover"
-              />
-            </div>
-            <div className="space-y-6 order-1 lg:order-2">
-              <h2 className="font-heading text-3xl font-bold text-foreground sm:text-4xl">
-                How We're Solving This
-              </h2>
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                HealthConnect brings essential health information and services to your phone. We've designed everything to work on slow internet, 
-                use simple language, and be accessible to everyone—even those who aren't tech-savvy.
-              </p>
-              <ul className="space-y-4">
-                <li className="flex gap-3">
-                  <div className="mt-1 h-2 w-2 rounded-full bg-secondary flex-shrink-0" />
-                  <p className="text-muted-foreground">Easy-to-understand health guides on hygiene, nutrition, and common diseases</p>
-                </li>
-                <li className="flex gap-3">
-                  <div className="mt-1 h-2 w-2 rounded-full bg-secondary flex-shrink-0" />
-                  <p className="text-muted-foreground">Step-by-step tutorials on using digital health tools</p>
-                </li>
-                <li className="flex gap-3">
-                  <div className="mt-1 h-2 w-2 rounded-full bg-secondary flex-shrink-0" />
-                  <p className="text-muted-foreground">Find nearby hospitals and connect with doctors remotely</p>
-                </li>
-              </ul>
             </div>
           </div>
         </div>
