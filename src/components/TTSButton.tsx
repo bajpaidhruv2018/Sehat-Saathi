@@ -17,11 +17,45 @@ export const TTSButton = ({ text, size = "sm", variant = "ghost" }: TTSButtonPro
   const { language, t } = useLanguage();
   const { toast } = useToast();
 
-  const handleTTS = async () => {
-    if (isPlaying && audio) {
-      audio.pause();
+  const handleFallbackTTS = () => {
+    if (!('speechSynthesis' in window)) {
+      toast({
+        title: "Error",
+        description: "Text-to-speech not supported in this browser",
+        variant: "destructive",
+      });
       setIsPlaying(false);
-      setAudio(null);
+      return;
+    }
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = language === 'hi' ? 'hi-IN' : 'en-IN';
+    utterance.rate = 0.9;
+
+    utterance.onend = () => {
+      setIsPlaying(false);
+    };
+
+    utterance.onerror = () => {
+      setIsPlaying(false);
+      toast({
+        title: "Error",
+        description: "Failed to play audio",
+        variant: "destructive",
+      });
+    };
+
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const handleTTS = async () => {
+    if (isPlaying) {
+      if (audio) {
+        audio.pause();
+        setAudio(null);
+      }
+      window.speechSynthesis.cancel();
+      setIsPlaying(false);
       return;
     }
 
@@ -40,23 +74,23 @@ export const TTSButton = ({ text, size = "sm", variant = "ghost" }: TTSButtonPro
       );
       const audioUrl = URL.createObjectURL(audioBlob);
       const audioElement = new Audio(audioUrl);
-      
+
       audioElement.onended = () => {
         setIsPlaying(false);
         setAudio(null);
         URL.revokeObjectURL(audioUrl);
       };
 
+      audioElement.onerror = () => {
+        console.error('Audio element error, falling back');
+        handleFallbackTTS();
+      };
+
       setAudio(audioElement);
       await audioElement.play();
     } catch (error) {
-      console.error('TTS error:', error);
-      toast({
-        title: "Error",
-        description: "Failed to play audio",
-        variant: "destructive",
-      });
-      setIsPlaying(false);
+      console.error('TTS error, falling back:', error);
+      handleFallbackTTS();
     }
   };
 

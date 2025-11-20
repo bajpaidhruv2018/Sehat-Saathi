@@ -253,7 +253,7 @@ export const GlobalTTSPlayer = () => {
       {!isOpen && (
         <Button
           onClick={startReading}
-          className="fixed bottom-32 right-6 z-40 rounded-full w-14 h-14 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-primary to-secondary hover:scale-110"
+          className="fixed bottom-48 right-6 z-40 rounded-full w-14 h-14 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-primary to-secondary hover:scale-110"
           size="lg"
           aria-label={language === 'en' ? 'Read Aloud' : 'ज़ोर से पढ़ें'}
         >
@@ -263,7 +263,7 @@ export const GlobalTTSPlayer = () => {
 
       {/* Mini Player */}
       {isOpen && (
-        <div className="global-tts-player fixed bottom-32 right-6 z-40 bg-background border border-border rounded-2xl shadow-xl p-4 w-80 animate-fade-in">
+        <div className="global-tts-player fixed bottom-48 right-6 z-40 bg-background border border-border rounded-2xl shadow-xl p-4 w-80 animate-fade-in">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               {isPlaying ? (
