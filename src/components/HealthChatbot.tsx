@@ -31,14 +31,20 @@ const HealthChatbot = () => {
   }, [messages]);
 
   const parseResponse = (text: string): { status?: 'TRUE' | 'FALSE'; english?: string; hindi?: string } => {
-    const statusMatch = text.match(/Status:\s*(.*?)(?:\n|$)/i);
-    const englishMatch = text.match(/English:\s*(.*?)(?=\nHindi:|$)/si);
-    const hindiMatch = text.match(/Hindi:\s*(.*?)$/si);
+    
+    const cleanText = text.replace(/\*\*/g, '');
+    
+    
+    const statusMatch = cleanText.match(/(?:Status|Verdict):\s*(.*?)(?:\n|$)/i);
+    const englishMatch = cleanText.match(/English:\s*([\s\S]*?)(?=\n\s*Hindi:|$)/i);
+    const hindiMatch = cleanText.match(/Hindi:\s*([\s\S]*?)$/i);
 
+    const statusText = statusMatch?.[1]?.toLowerCase() || '';
+    
     return {
-      status: statusMatch?.[1].includes('True') ? 'TRUE' : statusMatch?.[1].includes('False') ? 'FALSE' : undefined,
-      english: englishMatch?.[1].trim(),
-      hindi: hindiMatch?.[1].trim(),
+      status: statusText.includes('true') ? 'TRUE' : statusText.includes('false') ? 'FALSE' : undefined,
+      english: englishMatch?.[1]?.trim(),
+      hindi: hindiMatch?.[1]?.trim(),
     };
   };
 
@@ -52,6 +58,7 @@ const HealthChatbot = () => {
       });
 
       if (error) throw error;
+      if (!data.audioContent) throw new Error("No audio content");
 
       const audio = new Audio(`data:audio/mp3;base64,${data.audioContent}`);
       audio.onended = () => setIsSpeaking(false);
@@ -82,7 +89,7 @@ const HealthChatbot = () => {
 
       if (error) throw error;
 
-      const reply = data.reply || 'Sorry, I could not process that.';
+      const reply = data.reply || data.message || 'Sorry, I could not process that.';
       const parsed = parseResponse(reply);
 
       setMessages(prev => [...prev, { 
@@ -151,7 +158,10 @@ const HealthChatbot = () => {
                   : 'bg-muted text-foreground'
               }`}
             >
-              <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
+              {/* Only show raw text if we didn't successfully parse the English/Hindi parts */}
+{(!msg.english && !msg.hindi) && (
+  <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
+)}
               
               {msg.sender === 'assistant' && (
                 <>
