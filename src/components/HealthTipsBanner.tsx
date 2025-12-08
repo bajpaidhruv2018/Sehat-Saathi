@@ -43,11 +43,7 @@ const HealthTipsBanner = ({}: HealthTipsBannerProps) => {
       }
     } catch (error) {
       console.error('Error fetching tips:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load health tips",
-        variant: "destructive",
-      });
+      
     }
   };
 

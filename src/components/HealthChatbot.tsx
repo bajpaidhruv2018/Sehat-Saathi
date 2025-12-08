@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { X, Send, Sparkles, Volume2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
+// import { supabase } from '@/integrations/supabase/client'; // Commented out for mock mode
 import { useToast } from '@/components/ui/use-toast';
 
 interface Message {
@@ -31,9 +31,7 @@ const HealthChatbot = () => {
   }, [messages]);
 
   const parseResponse = (text: string): { status?: 'TRUE' | 'FALSE'; english?: string; hindi?: string } => {
-    
     const cleanText = text.replace(/\*\*/g, '');
-    
     
     const statusMatch = cleanText.match(/(?:Status|Verdict):\s*(.*?)(?:\n|$)/i);
     const englishMatch = cleanText.match(/English:\s*([\s\S]*?)(?=\n\s*Hindi:|$)/i);
@@ -52,23 +50,29 @@ const HealthChatbot = () => {
     if (isSpeaking) return;
     
     setIsSpeaking(true);
+    
     try {
-      const { data, error } = await supabase.functions.invoke('text-to-speech', {
-        body: { text },
-      });
-
-      if (error) throw error;
-      if (!data.audioContent) throw new Error("No audio content");
-
-      const audio = new Audio(`data:audio/mp3;base64,${data.audioContent}`);
-      audio.onended = () => setIsSpeaking(false);
-      await audio.play();
+      if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        const voices = window.speechSynthesis.getVoices();
+        // Try to find a Hindi voice if the text contains Hindi characters, otherwise English
+        const isHindi = /[\u0900-\u097F]/.test(text);
+        const voice = voices.find(v => v.lang.startsWith(isHindi ? 'hi' : 'en'));
+        if (voice) utterance.voice = voice;
+        
+        utterance.onend = () => setIsSpeaking(false);
+        utterance.onerror = () => setIsSpeaking(false);
+        
+        window.speechSynthesis.speak(utterance);
+      } else {
+        throw new Error("Speech synthesis not supported");
+      }
     } catch (error) {
       console.error('Error with TTS:', error);
       setIsSpeaking(false);
       toast({
         title: "Error",
-        description: "Failed to play audio",
+        description: "Text-to-speech is not supported in this browser.",
         variant: "destructive",
       });
     }
@@ -83,23 +87,52 @@ const HealthChatbot = () => {
     setIsTyping(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke('health-chat', {
-        body: { message: input },
-      });
+      // --- SMART MOCK RESPONSE SIMULATION ---
+      await new Promise(resolve => setTimeout(resolve, 1500));
 
-      if (error) throw error;
+      const lowerInput = userMsg.text.toLowerCase();
+      let mockReply = "";
 
-      const reply = data.reply || data.message || 'Sorry, I could not process that.';
-      const parsed = parseResponse(reply);
+      // 1. Check for specific keywords to return realistic responses
+      if (lowerInput.includes("milk") && (lowerInput.includes("fish") || lowerInput.includes("non veg"))) {
+        mockReply = `Status: FALSE
+English: There is no scientific evidence that drinking milk after eating fish causes leukemia or skin spots (vitiligo). This is a common myth.
+Hindi: मछली खाने के बाद दूध पीने से ल्यूकेमिया या त्वचा के धब्बे (विटिलिगो) होने का कोई वैज्ञानिक प्रमाण नहीं है। यह एक आम मिथक है।`;
+      } 
+      else if (lowerInput.includes("vaccine") || lowerInput.includes("autism")) {
+        mockReply = `Status: FALSE
+English: Vaccines are safe and do not cause autism. This claim has been debunked by extensive medical research.
+Hindi: टीके सुरक्षित हैं और इनसे ऑटिज्म नहीं होता है। व्यापक चिकित्सा अनुसंधान द्वारा इस दावे का खंडन किया गया है।`;
+      }
+      else if (lowerInput.includes("water") || lowerInput.includes("drink")) {
+        mockReply = `Status: TRUE
+English: Staying hydrated is essential for health. Drinking 8 glasses of water a day is a good general guideline.
+Hindi: स्वस्थ रहने के लिए हाइड्रेटेड रहना जरूरी है। दिन में 8 गिलास पानी पीना एक अच्छा सामान्य नियम है।`;
+      }
+      else if (lowerInput.includes("pregnant") || lowerInput.includes("pregnancy")) {
+        mockReply = `Status: FALSE
+English: Pregnant women should not "eat for two" literally. They need only about 300 extra calories per day.
+Hindi: गर्भवती महिलाओं को वास्तव में "दो लोगों के लिए" नहीं खाना चाहिए। उन्हें प्रतिदिन केवल लगभग 300 अतिरिक्त कैलोरी की आवश्यकता होती है।`;
+      }
+      // 2. Default Fallback
+      else {
+        mockReply = `Status: FALSE
+English: (Simulation) I cannot verify this specific claim in offline mode. Please consult a doctor for accurate advice.
+Hindi: (सिमुलेशन) मैं ऑफ़लाइन मोड में इस दावे की पुष्टि नहीं कर सकता। सटीक सलाह के लिए कृपया डॉक्टर से सलाह लें।`;
+      }
+
+      const parsed = parseResponse(mockReply);
 
       setMessages(prev => [...prev, { 
         sender: 'assistant', 
-        text: reply, 
+        text: mockReply, 
         timestamp: new Date(),
         mythStatus: parsed.status,
         english: parsed.english,
         hindi: parsed.hindi,
       }]);
+      // --- END MOCK RESPONSE ---
+
     } catch (error) {
       console.error('Error:', error);
       toast({
@@ -159,9 +192,9 @@ const HealthChatbot = () => {
               }`}
             >
               {/* Only show raw text if we didn't successfully parse the English/Hindi parts */}
-{(!msg.english && !msg.hindi) && (
-  <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
-)}
+              {(!msg.english && !msg.hindi) && (
+                <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
+              )}
               
               {msg.sender === 'assistant' && (
                 <>
@@ -193,7 +226,7 @@ const HealthChatbot = () => {
                   )}
                   
                   <button
-                    onClick={() => speakText(msg.text)}
+                    onClick={() => speakText(msg.english || msg.text)}
                     disabled={isSpeaking}
                     className="mt-2 text-xs text-primary hover:text-primary/80 disabled:opacity-50 flex items-center gap-1"
                   >
