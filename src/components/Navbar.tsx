@@ -110,7 +110,7 @@ const Navbar = () => {
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+      <div className="container mx-auto flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link to="/" className="flex items-center gap-2 shrink-0">
           <div className="rounded-full bg-gradient-primary p-2">
             <Heart className="h-6 w-6 text-white" />
@@ -119,14 +119,14 @@ const Navbar = () => {
         </Link>
 
         {/* DESKTOP NAVIGATION */}
-        <div className="hidden items-center gap-1 xl:flex">
+        <div className="hidden items-center gap-1 xl:flex xl:flex-1 xl:overflow-x-auto xl:px-4 xl:min-w-0 xl:pr-6 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
           {navItems.map((item) => (
             <NavButtonWithSpeech
               key={item.path}
               item={item}
               to={item.path}
               isActive={location.pathname === item.path}
-              className={`font-medium h-9 px-3 text-xs transition-all duration-300 ${item.special
+              className={`font-medium h-9 px-3 text-xs transition-all duration-300 shrink-0 ${item.special
                 ? "bg-gradient-to-r from-primary to-secondary text-white hover:shadow-lg hover:scale-105 animate-pulse-slow border-2 border-transparent hover:border-primary/50"
                 : ""
                 }`}
@@ -135,17 +135,15 @@ const Navbar = () => {
               {item.special && <span className="ml-1 text-[10px]">✨</span>}
             </NavButtonWithSpeech>
           ))}
+        </div>
 
-          <div className="flex items-center gap-1 ml-2 pl-2 border-l border-border">
-            <LanguageSwitcher />
-            <ThemeToggle />
-          </div>
+        <div className="hidden items-center gap-1 ml-2 pl-2 border-l border-border xl:flex shrink-0">
+          <LanguageSwitcher />
+          <ThemeToggle />
         </div>
 
         {/* MOBILE NAVIGATION */}
-        <div className="flex items-center gap-2 xl:hidden">
-          <LanguageSwitcher />
-          <ThemeToggle />
+        <div className="xl:hidden">
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
@@ -153,22 +151,31 @@ const Navbar = () => {
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px] sm:w-[400px] overflow-y-auto">
-              <div className="mt-8 flex flex-col gap-4">
-                {navItems.map((item) => (
-                  <NavButtonWithSpeech
-                    key={item.path}
-                    item={item}
-                    to={item.path}
-                    isActive={location.pathname === item.path}
-                    className={`w-full justify-start text-lg transition-all duration-300 ${item.special
-                      ? "bg-gradient-to-r from-primary to-secondary text-white hover:shadow-lg border-2 border-transparent hover:border-primary/50"
-                      : ""
-                      }`}
-                  >
-                    {item.name}
-                    {item.special && <span className="ml-2">✨</span>}
-                  </NavButtonWithSpeech>
-                ))}
+              <div className="flex flex-col gap-6 mt-6">
+                <div className="flex items-center justify-between border-b pb-4">
+                  <span className="font-semibold">{t('nav.settings', { defaultValue: 'Settings' })}</span>
+                  <div className="flex items-center gap-2">
+                    <LanguageSwitcher />
+                    <ThemeToggle />
+                  </div>
+                </div>
+                <div className="flex flex-col gap-4">
+                  {navItems.map((item) => (
+                    <NavButtonWithSpeech
+                      key={item.path}
+                      item={item}
+                      to={item.path}
+                      isActive={location.pathname === item.path}
+                      className={`w-full justify-start text-lg transition-all duration-300 ${item.special
+                        ? "bg-gradient-to-r from-primary to-secondary text-white hover:shadow-lg border-2 border-transparent hover:border-primary/50"
+                        : ""
+                        }`}
+                    >
+                      {item.name}
+                      {item.special && <span className="ml-2">✨</span>}
+                    </NavButtonWithSpeech>
+                  ))}
+                </div>
               </div>
             </SheetContent>
           </Sheet>

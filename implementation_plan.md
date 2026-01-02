@@ -22,6 +22,32 @@ Improve the `SpeechService` to strictly select Indian vernacular voices and avoi
     -   **Others**: If no voice found, **Log Warning/Show Toast** and **Do Not Speak**.
 - **Native Detection**: Strictly use `i18n.language`.
 
+
+
+
+### Content Expansion
+#### [MODIFY] [translation.json](file:///c:/College/hackathons/SehatSaathi/remote-well-reach/public/locales/en/translation.json)
+- Add 10 new items to `misconceptions.items` array.
+- Ensure unique IDs.
+
+
+#### [MODIFY] [translation.json](file:///c:/College/hackathons/SehatSaathi/remote-well-reach/public/locales/hi/translation.json)
+- Add corresponding Hindi translations for the new myths.
+
+#### [MODIFY] Vernacular Files (bn, te, ta, or, pa)
+- Propagate the 10 new myth items to all other translation files to prevent empty cards.
+- Use English/Hindi as placeholders where native translation is unavailable.
+
+### Image Integration
+#### [MODIFY] [Education.tsx](file:///c:/College/hackathons/SehatSaathi/remote-well-reach/src/pages/Education.tsx)
+- Update `mentalHealth` item to use `/mentalhealth_image.png`.
+- Update `vaccination` item to use `/vaccination_image.jpeg`.
+
+### Navbar Layout
+#### [MODIFY] [Navbar.tsx](file:///c:/College/hackathons/SehatSaathi/remote-well-reach/src/components/Navbar.tsx)
+- Add `min-w-0` to the scrollable navigation container to correctly handle flex shrinking and trigger scrolling.
+- Add `pr-6` to ensure the last navigation item doesn't touch the settings divider.
+
 ## Verification Plan
 ### Automated Tests
 - Unit tests not applicable in this environment.

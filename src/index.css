@@ -135,8 +135,24 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  html {
+    /* Prevent horizontal scroll on mobile */
+    overflow-x: hidden;
+    /* Optimize touch interactions */
+    touch-action: manipulation;
+  }
+
   body {
     @apply bg-background text-foreground transition-colors duration-300;
+    /* Ensure body doesn't overflow either */
+    overflow-x: hidden;
+    width: 100%;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Prevent auto-zoom on inputs in iOS by ensuring font size is at least 16px */
+  input, select, textarea {
+    font-size: 16px !important;
   }
 }
 

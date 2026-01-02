@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
-import { XCircle, CheckCircle, Droplet, ThermometerSun, Syringe, Baby, Hospital } from "lucide-react";
+import { XCircle, CheckCircle, Droplet, ThermometerSun, Syringe, Baby, Hospital, Brain, Pill, Users, Glasses, Sun, Activity, AlertTriangle } from "lucide-react";
 import { AudioIcon } from "@/components/ui/AudioIcon";
 
 import { useTranslation } from "react-i18next";
@@ -73,6 +73,116 @@ const misconceptions: Misconception[] = [
     tipHi: "PHC मुफ्त दवाएं, टीकाकरण, मातृ देखभाल और बुनियादी उपचार प्रदान करते हैं। आशा कार्यकर्ता और ANM सामान्य स्वास्थ्य समस्याओं में मदद के लिए प्रशिक्षित हैं। जांच के लिए अपने निकटतम PHC पर जाएं।",
     videoUrl: "https://www.youtube.com/watch?v=YM8jR8VYjY0",
   },
+  {
+    id: 6,
+    icon: Baby,
+    mythEn: "Eating papaya during pregnancy causes miscarriage.",
+    mythHi: "गर्भावस्था के दौरान पपीता खाने से गर्भपात होता है।",
+    factEn: "Ripe papaya is safe and full of vitamins.",
+    factHi: "पका हुआ पपीता सुरक्षित होता है और विटामिन से भरपूर होता है।",
+    tipEn: "Fully ripe papaya is excellent for pregnant women as it contains Vitamin A and C. Avoid raw or semi-ripe papaya as it contains latex which might be harmful.",
+    tipHi: "पूरी तरह से पका हुआ पपीता गर्भवती महिलाओं के लिए बहुत अच्छा होता है क्योंकि इसमें विटामिन ए और सी होता है। कच्चे या अधपके पपीते से बचें क्योंकि इसमें लैटेक्स होता है जो हानिकारक हो सकता है।",
+    videoUrl: "https://www.youtube.com",
+  },
+  {
+    id: 7,
+    icon: Brain,
+    mythEn: "Mental illness is caused by evil spirits.",
+    mythHi: "मानसिक बीमारी बुरी आत्माओं के कारण होती है।",
+    factEn: "It is a medical condition treatable by doctors.",
+    factHi: "यह एक चिकित्सीय स्थिति है जिसका इलाज डॉक्टरों द्वारा किया जा सकता है।",
+    tipEn: "Mental health issues are brain disorders, not supernatural events. Psychiatrists and psychologists can treat them with therapy and medication.",
+    tipHi: "मानसिक स्वास्थ्य समस्याएं मस्तिष्क संबंधी विकार हैं, कोई अलौकिक घटना नहीं। मनोचिकितसक और मनोवैज्ञानिक चिकित्सा और दवा के साथ उनका इलाज कर सकते हैं।",
+    videoUrl: "https://www.youtube.com",
+  },
+  {
+    id: 8,
+    icon: Pill,
+    mythEn: "Antibiotics cure colds and flu.",
+    mythHi: "एंटीबायोटिक्स सर्दी और फ्लू को ठीक करते हैं।",
+    factEn: "Antibiotics only kill bacteria, not viruses.",
+    factHi: "एंटीबायोटिक्स केवल बैक्टीरिया को मारते हैं, वायरस को नहीं।",
+    tipEn: "Colds and flu are caused by viruses. Taking antibiotics for them won't help and can increase antibiotic resistance. Rest and hydration are best.",
+    tipHi: "सर्दी और फ्लू वायरस के कारण होते हैं। उनके लिए एंटीबायोटिक लेने से कोई मदद नहीं मिलेगी और एंटीबायोटिक प्रतिरोध बढ़ सकता है। आराम और जलयोजन सबसे अच्छा है।",
+    videoUrl: "https://www.youtube.com",
+  },
+  {
+    id: 9,
+    icon: Users,
+    mythEn: "Men don't need to worry about family planning.",
+    mythHi: "पुरुषों को परिवार नियोजन के बारे में चिंता करने की जरूरत नहीं है।",
+    factEn: "Family planning is a shared responsibility.",
+    factHi: "परिवार नियोजन एक साझा जिम्मेदारी है।",
+    tipEn: "Men play a crucial role. Condoms are a safe, effective method of contraception that involves men and also protects against sexually transmitted infections.",
+    tipHi: "पुरुष महत्वपूर्ण भूमिका निभाते हैं। कंडोम गर्भनिरोधक का एक सुरक्षित, प्रभावी तरीका है जिसमें पुरुष शामिल होते हैं और यौन संचारित संक्रमणों से भी बचाता है।",
+    videoUrl: "https://www.youtube.com",
+  },
+  {
+    id: 10,
+    icon: Droplet,
+    mythEn: "Drinking less water reduces swelling during pregnancy.",
+    mythHi: "गर्भावस्था के दौरान कम पानी पीने से सूजन कम हो जाती है।",
+    factEn: "Drinking enough water actually helps reduce swelling.",
+    factHi: "पर्याप्त पानी पीने से वास्तव में सूजन कम करने में मदद मिलती है।",
+    tipEn: "Staying hydrated helps flush out waste and prevents fluid retention. Pregnant women should drink 8-10 glasses of water daily.",
+    tipHi: "हाइड्रेटेड रहने से अपशिष्ट को बाहर निकालने में मदद मिलती है और तरल प्रतिधारण को रोकता है। गर्भवती महिलाओं को रोजाना 8-10 गिलास पानी पीना चाहिए।",
+    videoUrl: "https://www.youtube.com",
+  },
+  {
+    id: 11,
+    icon: Glasses,
+    mythEn: "Wearing glasses makes eyesight worse.",
+    mythHi: "चश्मा पहनने से आंखों की रोशनी और खराब हो जाती है।",
+    factEn: "Glasses correct vision and reduce eye strain.",
+    factHi: "चश्मा दृष्टि को ठीक करता है और आंखों के तनाव को कम करता है।",
+    tipEn: "Glasses help you see clearly and stop your eyes from working too hard. They do not weaken your eyes; refusing to wear them might cause headaches.",
+    tipHi: "चश्मा आपको स्पष्ट रूप से देखने में मदद करता है और आपकी आंखों को बहुत मेहनत करने से रोकता है। वे आपकी आंखों को कमजोर नहीं करते हैं; उन्हें पहनने से इनकार करने पर सिरदर्द हो सकता है।",
+    videoUrl: "https://www.youtube.com",
+  },
+  {
+    id: 12,
+    icon: Sun,
+    mythEn: "Dengue mosquitoes only bite at night.",
+    mythHi: "डेंगू के मच्छर केवल रात में काटते हैं।",
+    factEn: "They primarily bite during the day.",
+    factHi: "वे मुख्य रूप से दिन के दौरान काटते हैं।",
+    tipEn: "Aedes mosquitoes, which spread dengue, are most active early morning and late afternoon. Use repellents and wear full sleeves even during the day.",
+    tipHi: "एडीज मच्छर, जो डेंगू फैलाते हैं, सुबह और देर दोपहर में सबसे अधिक सक्रिय होते हैं। दिन के दौरान भी विकर्षक का प्रयोग करें और पूरी आस्तीन वाले कपड़े पहनें।",
+    videoUrl: "https://www.youtube.com",
+  },
+  {
+    id: 13,
+    icon: Baby,
+    mythEn: "Newborns should be given honey or water first.",
+    mythHi: "नवजात शिशुओं को पहले शहद या पानी दिया जाना चाहिए।",
+    factEn: "Only breastmilk should be given for 6 months.",
+    factHi: "6 महीने तक केवल मां का दूध ही देना चाहिए।",
+    tipEn: "Breastmilk contains all the water and nutrients a baby needs. Honey can be dangerous for infants under 1 year due to botulism risk.",
+    tipHi: "मां के दूध में वह सारा पानी और पोषक तत्व होते हैं जो बच्चे को चाहिए होते हैं। बोटुलिज़्म के खतरे के कारण 1 साल से कम उम्र के बच्चों के लिए शहद खतरनाक हो सकता है।",
+    videoUrl: "https://www.youtube.com",
+  },
+  {
+    id: 14,
+    icon: Activity,
+    mythEn: "TB is hereditary and cannot be cured.",
+    mythHi: "टीबी वंशानुगत है और इसका इलाज नहीं किया जा सकता है।",
+    factEn: "TB is infectious but completely curable.",
+    factHi: "टीबी संक्रामक है लेकिन पूरी तरह से इलाज योग्य है।",
+    tipEn: "Tuberculosis spreads through air when someone coughs. It is not genetic. With a full course of DOTS treatment, it can be cured completely.",
+    tipHi: "जब कोई खांसता है तो तपेदिक हवा के माध्यम से फैलता है। यह आनुवंशिक नहीं है। डॉट्स (DOTS) उपचार के एक पूर्ण पाठ्यक्रम के साथ, इसे पूरी तरह से ठीक किया जा सकता है।",
+    videoUrl: "https://www.youtube.com",
+  },
+  {
+    id: 15,
+    icon: AlertTriangle,
+    mythEn: "Snake bites should be cut and sucked.",
+    mythHi: "सांप के काटने पर काट कर चूसना चाहिए।",
+    factEn: "Never cut or suck the wound; go to hospital.",
+    factHi: "घाव को कभी न काटें या चूसें; अस्पताल जाएं।",
+    tipEn: "Immobilize the bitten limb and keep the patient calm. Cutting or sucking wastes time and can cause infection. Antivenom at a hospital is the only cure.",
+    tipHi: "काटे गए अंग को स्थिर करें और रोगी को शांत रखें। काटने या चूसने से समय बर्बाद होता है और संक्रमण हो सकता है। अस्पताल में एंटीवेनम ही एकमात्र इलाज है।",
+    videoUrl: "https://www.youtube.com",
+  },
 ];
 
 const MythCard = ({ misconception }: { misconception: any }) => {
@@ -80,18 +190,7 @@ const MythCard = ({ misconception }: { misconception: any }) => {
   const { t, i18n } = useTranslation();
 
   // Map ID to icon - we keep icons in code as they are React components
-  const getIcon = (id: number) => {
-    switch (id) {
-      case 1: return Syringe;
-      case 2: return Baby;
-      case 3: return Droplet;
-      case 4: return ThermometerSun;
-      case 5: return Hospital;
-      default: return Syringe;
-    }
-  };
-
-  const Icon = getIcon(misconception.id);
+  const Icon = misconception.icon;
   const isHindi = i18n.language === 'hi';
 
   // Helper to get text content
@@ -182,15 +281,15 @@ const Misconceptions = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-accent/5 to-background animate-fade-in">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-primary/10 to-secondary/10 py-16 animate-slide-in-right">
+      <section className="bg-gradient-to-r from-primary/10 to-secondary/10 py-12 md:py-16 animate-slide-in-right">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="font-heading mb-4 text-4xl font-bold text-foreground md:text-5xl animate-scale-in">
+          <h1 className="font-heading mb-4 text-3xl font-bold text-foreground md:text-5xl animate-scale-in">
             {t('misconceptions.title')}
           </h1>
-          <h2 className="font-heading mb-6 text-xl font-semibold text-muted-foreground md:text-2xl animate-scale-in" style={{ animationDelay: '100ms' }}>
+          <h2 className="font-heading mb-6 text-lg font-semibold text-muted-foreground md:text-2xl animate-scale-in" style={{ animationDelay: '100ms' }}>
             {t('misconceptions.subtitle')}
           </h2>
-          <p className="mx-auto max-w-3xl text-lg text-muted-foreground animate-fade-in" style={{ animationDelay: '200ms' }}>
+          <p className="mx-auto max-w-3xl text-base text-muted-foreground md:text-lg animate-fade-in" style={{ animationDelay: '200ms' }}>
             {t('misconceptions.description')}
           </p>
         </div>

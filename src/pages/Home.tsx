@@ -14,30 +14,30 @@ const Home = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative bg-gradient-hero py-20 md:py-32 overflow-hidden">
+      <section className="relative bg-gradient-hero py-12 md:py-32 overflow-hidden">
         <div className="container mx-auto px-4">
-          <div className="grid gap-12 lg:grid-cols-2 lg:gap-8 items-center">
-            <div className="space-y-6 animate-fade-in">
-              <h1 className="font-heading text-4xl font-bold leading-tight text-foreground sm:text-5xl md:text-6xl">
+          <div className="grid gap-8 lg:grid-cols-2 lg:gap-8 items-center">
+            <div className="space-y-6 animate-fade-in text-center lg:text-left">
+              <h1 className="font-heading text-3xl font-bold leading-tight text-foreground sm:text-5xl md:text-6xl break-words">
                 {t('home.hero.title')}
               </h1>
-              <p className="text-lg text-muted-foreground md:text-xl max-w-xl">
+              <p className="text-base text-muted-foreground md:text-xl max-w-xl mx-auto lg:mx-0">
                 {t('home.hero.subtitle')}
               </p>
-              <div className="flex flex-col gap-4 sm:flex-row">
-                <Button asChild size="lg" className="rounded-xl shadow-medium hover:shadow-strong transition-all">
+              <div className="flex flex-col gap-3 sm:flex-row justify-center lg:justify-start">
+                <Button asChild size="lg" className="rounded-xl shadow-medium hover:shadow-strong transition-all w-full sm:w-auto">
                   <Link to="/education">{t('home.hero.explore')}</Link>
                 </Button>
-                <Button asChild variant="outline" size="lg" className="rounded-xl">
+                <Button asChild variant="outline" size="lg" className="rounded-xl w-full sm:w-auto">
                   <Link to="/healthcare">{t('home.hero.find')}</Link>
                 </Button>
               </div>
             </div>
-            <div className="relative animate-fade-in">
+            <div className="relative animate-fade-in mt-8 lg:mt-0">
               <img
                 src={heroImage}
                 alt="Healthcare worker helping rural community"
-                className="rounded-2xl shadow-strong w-full h-auto object-cover"
+                className="rounded-2xl shadow-strong w-full h-auto object-cover max-h-[300px] md:max-h-full"
               />
             </div>
           </div>

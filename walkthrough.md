@@ -33,3 +33,26 @@ I have completely overhauled the TTS system to be granular, language-aware, and 
 3.  **Visuals**:
     - Hover over Navbar buttons.
     - **Expected**: "Magnetic" white spotlight effect + gray background, restoring invalid state instantly on mouse leave.
+
+## Translation & UI Fixes
+- **Hindi Translations**: Added missing keys for "Mental Health", "First Aid", and "Lifestyle" to `public/locales/hi/translation.json`.
+
+- **Navbar Layout**: Fixed desktop overflow issue with Tamil language by enabling horizontal scrolling (`overflow-x-auto`) for navigation items and separating the settings toggles to ensure they remain accessible. Fixed "Find Hospitals" link overlap with language dropdown by adding padding and better flex handling.
+
+## Asset Integration
+
+- **Education Images**: Updated "Mental Health" and "Vaccination" topics to use local images (`mentalhealth_image.png`, `vaccination_image.jpeg`) instead of Unsplash URLs.
+
+## Content Expansion
+-4.  **Expanded Myth vs Fact Section**:
+    *   Increased the number of health myths from 5 to 15.
+    *   Added 10 new myths covering topics like pregnancy, mental health, antibiotics, and more.
+    *   **Completed**: Propagated these new items to all supported languages (Hindi, Telugu, Bengali, Tamil, Odia, Punjabi, Marathi) with **native translations** (replacing initial placeholders).
+    *   **Fixed**: Resolved issue where Hindi translations were not appearing by updating `public/locales/hi/translation.json` to use correct primary keys.
+    *   **Icons**: Replaced generic icons with specific ones for the new myths (e.g., `Brain` for mental health, `Baby` for pregnancy, `Sun` for dengue).
+    *   Updated `Misconceptions.tsx` to handle dynamic icons for the new items.
+
+5.  **Navbar UI Fixes**:
+    *   Solved desktop overflow issues for languages with longer text (e.g., Tamil).
+    *   Enabled horizontal scrolling for navigation items while hiding scrollbars for a clean look.
+    *   Fixed overlap between navigation links and the language switcher by adjusting container width constraints.
