@@ -3,6 +3,7 @@ import { X, Send, Sparkles, Volume2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
+import { useTranslation } from 'react-i18next';
 
 interface Message {
   sender: 'user' | 'assistant';
@@ -21,6 +22,7 @@ const HealthChatbot = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -108,8 +110,8 @@ const HealthChatbot = () => {
     } catch (error) {
       console.error('Error:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to send message to the health expert.',
+        title: t('chatbot.error.title'),
+        description: t('chatbot.error.desc'),
         variant: 'destructive',
       });
 
@@ -143,7 +145,7 @@ const HealthChatbot = () => {
       <div className="flex items-center justify-between p-4 border-b border-border bg-gradient-to-r from-primary/10 to-secondary/10 rounded-t-2xl">
         <div className="flex items-center gap-2">
           <Sparkles className="h-5 w-5 text-primary" />
-          <h3 className="font-semibold text-foreground">Health Myth Checker</h3>
+          <h3 className="font-semibold text-foreground">{t('chatbot.title')}</h3>
         </div>
         <button
           onClick={() => setIsOpen(false)}
@@ -156,8 +158,8 @@ const HealthChatbot = () => {
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 && (
           <div className="text-center text-muted-foreground py-8">
-            <p className="text-sm">Ask me to verify any health myth!</p>
-            <p className="text-xs mt-2">I'll respond in English and Hindi</p>
+            <p className="text-sm">{t('chatbot.emptyState.title')}</p>
+            <p className="text-xs mt-2">{t('chatbot.emptyState.subtitle')}</p>
           </div>
         )}
 
@@ -184,7 +186,7 @@ const HealthChatbot = () => {
                       ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
                       : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
                       }`}>
-                      {msg.mythStatus === 'TRUE' ? '✅ Myth is True' : '❌ Myth is False'}
+                      {msg.mythStatus === 'TRUE' ? t('chatbot.status.true') : t('chatbot.status.false')}
                     </div>
                   )}
 
@@ -211,7 +213,7 @@ const HealthChatbot = () => {
                     className="mt-2 text-xs text-primary hover:text-primary/80 disabled:opacity-50 flex items-center gap-1"
                   >
                     <Volume2 className="h-3 w-3" />
-                    {isSpeaking ? 'Speaking...' : 'Read Aloud'}
+                    {isSpeaking ? t('chatbot.speaking') : t('chatbot.readAloud')}
                   </button>
                 </>
               )}
@@ -240,7 +242,7 @@ const HealthChatbot = () => {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-            placeholder="Ask about a health myth..."
+            placeholder={t('chatbot.placeholder')}
             className="flex-1 px-4 py-2 bg-background border border-border rounded-full focus:outline-none focus:ring-2 focus:ring-primary text-sm"
             disabled={isTyping}
           />
@@ -257,5 +259,6 @@ const HealthChatbot = () => {
     </div>
   );
 };
+
 
 export default HealthChatbot;

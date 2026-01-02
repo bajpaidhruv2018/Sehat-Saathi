@@ -4,8 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { MapPin, Phone, Navigation, Star, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-
-import { useLanguage } from "@/contexts/LanguageContext";
+import { useTranslation } from "react-i18next";
 
 interface Hospital {
   id: string;
@@ -29,7 +28,7 @@ const HealthLocator = () => {
   const mapInstanceRef = useRef<google.maps.Map | null>(null);
   const markersRef = useRef<google.maps.Marker[]>([]);
   const { toast } = useToast();
-  const { t } = useLanguage();
+  const { t } = useTranslation();
 
   const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
 
@@ -225,7 +224,7 @@ const HealthLocator = () => {
               <CardHeader>
                 <CardTitle>{t('locator.nearbyList')}</CardTitle>
                 <CardDescription>
-                  {loading ? t('locator.loading') : `${hospitals.length} hospitals found`}
+                  {loading ? t('locator.loading') : `${hospitals.length} ${t('locator.nearbyList')}`}
                 </CardDescription>
               </CardHeader>
               <CardContent className="max-h-[500px] overflow-y-auto space-y-3">
@@ -251,9 +250,8 @@ const HealthLocator = () => {
                 {hospitals.map((hospital) => (
                   <Card
                     key={hospital.id}
-                    className={`cursor-pointer transition-all hover:shadow-lg ${
-                      selectedHospital?.id === hospital.id ? 'ring-2 ring-primary' : ''
-                    }`}
+                    className={`cursor-pointer transition-all hover:shadow-lg ${selectedHospital?.id === hospital.id ? 'ring-2 ring-primary' : ''
+                      }`}
                     onClick={() => {
                       setSelectedHospital(hospital);
                       if (mapInstanceRef.current) {
@@ -265,7 +263,7 @@ const HealthLocator = () => {
                     <CardContent className="p-4">
                       <h3 className="font-semibold text-lg mb-2">{hospital.name}</h3>
                       <p className="text-sm text-muted-foreground mb-2">{hospital.address}</p>
-                      
+
                       <div className="flex items-center gap-4 mb-3">
                         {hospital.rating && (
                           <div className="flex items-center gap-1">

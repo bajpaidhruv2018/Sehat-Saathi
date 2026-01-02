@@ -6,8 +6,11 @@ import FeatureCard from "@/components/FeatureCard";
 import heroImage from "@/assets/rural-healthcare.jpg";
 import communityImage from "@/assets/healthcare-clinic.jpg";
 import elderImage from "@/assets/mobile-clinic.jpg";
+import { useTranslation } from "react-i18next";
 
 const Home = () => {
+  const { t } = useTranslation();
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -16,24 +19,24 @@ const Home = () => {
           <div className="grid gap-12 lg:grid-cols-2 lg:gap-8 items-center">
             <div className="space-y-6 animate-fade-in">
               <h1 className="font-heading text-4xl font-bold leading-tight text-foreground sm:text-5xl md:text-6xl">
-                Your Family Compounder - SehatSaathi
+                {t('home.hero.title')}
               </h1>
               <p className="text-lg text-muted-foreground md:text-xl max-w-xl">
-                Sehat Saathi is like your that relative who has got those clutch connections to help you in different fields of human endeavour when all hope is lost.
+                {t('home.hero.subtitle')}
               </p>
               <div className="flex flex-col gap-4 sm:flex-row">
                 <Button asChild size="lg" className="rounded-xl shadow-medium hover:shadow-strong transition-all">
-                  <Link to="/education">Explore Health Topics</Link>
+                  <Link to="/education">{t('home.hero.explore')}</Link>
                 </Button>
                 <Button asChild variant="outline" size="lg" className="rounded-xl">
-                  <Link to="/healthcare">Find Healthcare</Link>
+                  <Link to="/healthcare">{t('home.hero.find')}</Link>
                 </Button>
               </div>
             </div>
             <div className="relative animate-fade-in">
-              <img 
-                src={heroImage} 
-                alt="Healthcare worker helping rural community" 
+              <img
+                src={heroImage}
+                alt="Healthcare worker helping rural community"
                 className="rounded-2xl shadow-strong w-full h-auto object-cover"
               />
             </div>
@@ -46,53 +49,53 @@ const Home = () => {
         <div className="container mx-auto px-4">
           <div className="text-center space-y-4 mb-12">
             <h2 className="font-heading text-3xl font-bold text-foreground sm:text-4xl">
-              What You Can Do Here
+              {t('home.features.title')}
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Simple tools designed for real people facing real challenges.
+              {t('home.features.subtitle')}
             </p>
           </div>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
             <FeatureCard
               icon={BookOpen}
-              title="Health Education"
-              description="Learn about hygiene, vaccinations, nutrition, and preventing common diseases in simple, visual guides."
+              title={t('home.features.education.title')}
+              description={t('home.features.education.desc')}
               iconBgClass="bg-primary/10 text-primary"
             />
-            
+
             <FeatureCard
               icon={Smartphone}
-              title="Digital Literacy"
-              description="Easy tutorials on booking appointments online, reading digital prescriptions, and using health apps."
+              title={t('home.features.literacy.title')}
+              description={t('home.features.literacy.desc')}
               iconBgClass="bg-secondary/10 text-secondary"
             />
-            
+
             <FeatureCard
               icon={MapPin}
-              title="Find Healthcare"
-              description="Locate nearby hospitals, clinics, and pharmacies. Connect with doctors through chat or video."
+              title={t('home.features.healthcare.title')}
+              description={t('home.features.healthcare.desc')}
               iconBgClass="bg-accent-foreground/10 text-accent-foreground"
             />
-            
+
             <FeatureCard
               icon={Shield}
-              title="Emergency Help"
-              description="Quick access to emergency numbers and nearby emergency facilities when every second counts."
+              title={t('home.features.emergency.title')}
+              description={t('home.features.emergency.desc')}
               iconBgClass="bg-secondary/10 text-secondary"
             />
-            
+
             <FeatureCard
               icon={Users}
-              title="Offline Access"
-              description="Once you've opened any section, the information saves on your device and works without internet."
+              title={t('home.features.offline.title')}
+              description={t('home.features.offline.desc')}
               iconBgClass="bg-primary/10 text-primary"
             />
-            
+
             <FeatureCard
               icon={Heart}
-              title="Voice Support"
-              description="Use voice search and navigation for those who find typing difficult or are still learning."
+              title={t('home.features.voice.title')}
+              description={t('home.features.voice.desc')}
               iconBgClass="bg-accent-foreground/10 text-accent-foreground"
             />
           </div>
@@ -111,24 +114,24 @@ const Home = () => {
                   </div>
                   <div className="flex-1 text-center md:text-left space-y-3">
                     <h3 className="font-heading text-2xl md:text-3xl font-bold text-foreground group-hover:text-primary transition-colors">
-                      Explore Health Myths
+                      {t('home.myths.title')}
                     </h3>
                     <h4 className="font-heading text-xl md:text-2xl font-semibold text-muted-foreground">
-                      स्वास्थ्य से जुड़ी गलतफहमियाँ जानें
+                      {t('home.myths.titleHi')}
                     </h4>
                     <p className="text-base md:text-lg text-muted-foreground">
-                      Discover the truth about common health misconceptions. Tap interactive cards to learn facts that can save lives.
+                      {t('home.myths.desc')}
                     </p>
                     <p className="text-sm md:text-base text-muted-foreground">
-                      आम स्वास्थ्य गलतफहमियों की सच्चाई जानें। इंटरैक्टिव कार्ड्स को टैप करें और जानें वो तथ्य जो जीवन बचा सकते हैं।
+                      {t('home.myths.descHi')}
                     </p>
                   </div>
                   <div className="flex-shrink-0">
-                    <Button 
-                      size="lg" 
+                    <Button
+                      size="lg"
                       className="rounded-xl shadow-medium group-hover:shadow-strong group-hover:scale-105 transition-all duration-300"
                     >
-                      Learn Now / अभी जानें →
+                      {t('home.myths.cta')}
                     </Button>
                   </div>
                 </div>
@@ -143,24 +146,23 @@ const Home = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center space-y-8">
             <h2 className="font-heading text-3xl font-bold sm:text-4xl">
-              The Difference We Hope to Make
+              {t('home.impact.title')}
             </h2>
             <p className="text-lg text-white/90 leading-relaxed">
-              Every person who learns to check symptoms online, every family that finds a nearby clinic, every elderly person who books their first telemedicine appointment—that's progress. 
-              Small steps toward making healthcare accessible to everyone, everywhere.
+              {t('home.impact.desc')}
             </p>
             <div className="grid gap-8 md:grid-cols-3 pt-8">
               <div className="space-y-2">
-                <div className="text-4xl font-bold font-heading">10,000+</div>
-                <div className="text-white/80">People we aim to reach</div>
+                <div className="text-4xl font-bold font-heading">{t('home.impact.stat1.val')}</div>
+                <div className="text-white/80">{t('home.impact.stat1.label')}</div>
               </div>
               <div className="space-y-2">
-                <div className="text-4xl font-bold font-heading">50+</div>
-                <div className="text-white/80">Villages we want to serve</div>
+                <div className="text-4xl font-bold font-heading">{t('home.impact.stat2.val')}</div>
+                <div className="text-white/80">{t('home.impact.stat2.label')}</div>
               </div>
               <div className="space-y-2">
-                <div className="text-4xl font-bold font-heading">24/7</div>
-                <div className="text-white/80">Access to health info</div>
+                <div className="text-4xl font-bold font-heading">{t('home.impact.stat3.val')}</div>
+                <div className="text-white/80">{t('home.impact.stat3.label')}</div>
               </div>
             </div>
           </div>
@@ -173,24 +175,24 @@ const Home = () => {
           <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center max-w-6xl mx-auto">
             <div className="space-y-6">
               <h2 className="font-heading text-3xl font-bold text-foreground sm:text-4xl">
-                Why We Built This
+                {t('home.story.title')}
               </h2>
               <div className="space-y-4 text-muted-foreground leading-relaxed">
                 <p>
-                  We're a small team of students who've seen family members struggle to access basic healthcare. Whether it was a grandmother who couldn't read her prescription or a cousin who had to travel 50 kilometers for a simple checkup—we've all experienced the gap.
+                  {t('home.story.p1')}
                 </p>
                 <p>
-                  During a college hackathon, we decided to stop talking about the problem and actually do something. We're not healthcare experts or professional developers—just people who believe technology should make life easier, not harder.
+                  {t('home.story.p2')}
                 </p>
                 <p className="font-medium text-foreground">
-                  This is our small attempt to bridge that gap. To make healthcare feel a little less distant for people who need it most.
+                  {t('home.story.p3')}
                 </p>
               </div>
             </div>
             <div>
-              <img 
-                src={elderImage} 
-                alt="Elderly person using smartphone for healthcare" 
+              <img
+                src={elderImage}
+                alt="Elderly person using smartphone for healthcare"
                 className="rounded-2xl shadow-medium w-full h-auto object-cover"
               />
             </div>
@@ -203,18 +205,17 @@ const Home = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center space-y-6">
             <h2 className="font-heading text-3xl font-bold text-foreground sm:text-4xl">
-              Our Vision for the Future
+              {t('home.vision.title')}
             </h2>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              We imagine a world where your location doesn't determine your access to healthcare. Where a farmer in a remote village can video-call a doctor as easily as someone in a city. 
-              Where health literacy isn't a privilege, but a right everyone can exercise from their phone.
+              {t('home.vision.p1')}
             </p>
             <p className="text-lg text-foreground font-medium pt-4">
-              One app, one village, one person at a time—we're working toward that future.
+              {t('home.vision.p2')}
             </p>
             <div className="pt-8">
               <Button asChild size="lg" className="rounded-xl shadow-medium hover:shadow-strong transition-all">
-                <Link to="/education">Start Learning Today</Link>
+                <Link to="/education">{t('home.vision.cta')}</Link>
               </Button>
             </div>
           </div>
@@ -223,5 +224,6 @@ const Home = () => {
     </div>
   );
 };
+
 
 export default Home;

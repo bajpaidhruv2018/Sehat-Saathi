@@ -3,7 +3,7 @@ import { Heart, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { LanguageToggle } from "@/components/LanguageToggle";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const Navbar = () => {
@@ -42,20 +42,19 @@ const Navbar = () => {
                 variant={location.pathname === item.path ? "default" : "ghost"}
                 size="sm"
                 // Added 'text-xs' and reduced horizontal padding 'px-3'
-                className={`font-medium h-9 px-3 text-xs transition-all duration-300 ${
-                  item.special
+                className={`font-medium h-9 px-3 text-xs transition-all duration-300 ${item.special
                     ? "bg-gradient-to-r from-primary to-secondary text-white hover:shadow-lg hover:scale-105 animate-pulse-slow border-2 border-transparent hover:border-primary/50"
                     : ""
-                }`}
+                  }`}
               >
                 {item.name}
                 {item.special && <span className="ml-1 text-[10px]">✨</span>}
               </Button>
             </Link>
           ))}
-          
+
           <div className="flex items-center gap-1 ml-2 pl-2 border-l border-border">
-            <LanguageToggle />
+            <LanguageSwitcher />
             <ThemeToggle />
           </div>
         </div>
@@ -63,7 +62,7 @@ const Navbar = () => {
         {/* MOBILE NAVIGATION */}
         {/* Changed 'md:hidden' to 'xl:hidden' so this stays visible on tablets/landscape */}
         <div className="flex items-center gap-2 xl:hidden">
-          <LanguageToggle />
+          <LanguageSwitcher />
           <ThemeToggle />
           <Sheet>
             <SheetTrigger asChild>
@@ -77,11 +76,10 @@ const Navbar = () => {
                   <Link key={item.path} to={item.path}>
                     <Button
                       variant={location.pathname === item.path ? "default" : "ghost"}
-                      className={`w-full justify-start text-lg transition-all duration-300 ${
-                        item.special
+                      className={`w-full justify-start text-lg transition-all duration-300 ${item.special
                           ? "bg-gradient-to-r from-primary to-secondary text-white hover:shadow-lg border-2 border-transparent hover:border-primary/50"
                           : ""
-                      }`}
+                        }`}
                     >
                       {item.name}
                       {item.special && <span className="ml-2">✨</span>}

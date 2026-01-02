@@ -1,39 +1,44 @@
 import { Phone, MapPin, Ambulance, AlertCircle, Hospital, Pill } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
-const emergencyNumbers = [
-  { name: "Ambulance", number: "108", icon: Ambulance, color: "bg-red-500" },
-  { name: "National Emergency", number: "112", icon: AlertCircle, color: "bg-orange-500" },
-  { name: "Women Helpline", number: "1091", icon: Phone, color: "bg-purple-500" },
-  { name: "Child Helpline", number: "1098", icon: Phone, color: "bg-blue-500" },
-];
-
-const nearbyEmergency = [
-  {
-    name: "District Hospital Emergency",
-    type: "24/7 Emergency Room",
-    distance: "8.5 km",
-    phone: "1800-XXX-XXXX",
-    icon: Hospital,
-  },
-  {
-    name: "Community Health Center",
-    type: "Primary Emergency Care",
-    distance: "2.3 km",
-    phone: "1800-YYY-YYYY",
-    icon: Hospital,
-  },
-  {
-    name: "24/7 Pharmacy",
-    type: "Emergency Medicines",
-    distance: "3.1 km",
-    phone: "1800-ZZZ-ZZZZ",
-    icon: Pill,
-  },
-];
+import { useTranslation } from "react-i18next";
 
 const Emergency = () => {
+  const { t } = useTranslation();
+
+  const emergencyNumbers = [
+    { name: t('emergency.numbers.ambulance'), number: "108", icon: Ambulance, color: "bg-red-500" },
+    { name: t('emergency.numbers.national'), number: "112", icon: AlertCircle, color: "bg-orange-500" },
+    { name: t('emergency.numbers.women'), number: "1091", icon: Phone, color: "bg-purple-500" },
+    { name: t('emergency.numbers.child'), number: "1098", icon: Phone, color: "bg-blue-500" },
+  ];
+
+  const nearbyEmergency = [
+    {
+      name: t('emergency.facilities.hospital.name'),
+      type: t('emergency.facilities.hospital.type'),
+      distance: "8.5 km",
+      phone: "1800-XXX-XXXX",
+      icon: Hospital,
+    },
+    {
+      name: t('emergency.facilities.chc.name'),
+      type: t('emergency.facilities.chc.type'),
+      distance: "2.3 km",
+      phone: "1800-YYY-YYYY",
+      icon: Hospital,
+    },
+    {
+      name: t('emergency.facilities.pharmacy.name'),
+      type: t('emergency.facilities.pharmacy.type'),
+      distance: "3.1 km",
+      phone: "1800-ZZZ-ZZZZ",
+      icon: Pill,
+    },
+  ];
+
+  const tipsList = t('emergency.tips.list', { returnObjects: true }) as string[];
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -42,8 +47,8 @@ const Emergency = () => {
           <div className="flex items-center gap-3">
             <AlertCircle className="h-10 w-10 text-destructive" />
             <div>
-              <h1 className="text-4xl font-bold text-foreground">Emergency Resources</h1>
-              <p className="mt-2 text-lg text-muted-foreground">Quick access to emergency contacts and nearby facilities</p>
+              <h1 className="text-4xl font-bold text-foreground">{t('emergency.title')}</h1>
+              <p className="mt-2 text-lg text-muted-foreground">{t('emergency.subtitle')}</p>
             </div>
           </div>
         </div>
@@ -52,7 +57,7 @@ const Emergency = () => {
       {/* Emergency Numbers */}
       <section className="py-12">
         <div className="container mx-auto px-4">
-          <h2 className="mb-6 text-2xl font-bold text-foreground">Emergency Helpline Numbers</h2>
+          <h2 className="mb-6 text-2xl font-bold text-foreground">{t('emergency.helplineTitle')}</h2>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {emergencyNumbers.map((emergency, index) => {
               const IconComponent = emergency.icon;
@@ -69,7 +74,7 @@ const Emergency = () => {
                     <div className="mb-4 text-3xl font-bold text-destructive">{emergency.number}</div>
                     <Button variant="destructive" className="w-full" size="lg">
                       <Phone className="mr-2 h-5 w-5" />
-                      Call Now
+                      {t('emergency.callNow')}
                     </Button>
                   </CardContent>
                 </Card>
@@ -82,7 +87,7 @@ const Emergency = () => {
       {/* Nearby Emergency Facilities */}
       <section className="border-t border-border bg-muted py-12">
         <div className="container mx-auto px-4">
-          <h2 className="mb-6 text-2xl font-bold text-foreground">Nearby Emergency Facilities</h2>
+          <h2 className="mb-6 text-2xl font-bold text-foreground">{t('emergency.nearbyTitle')}</h2>
           <div className="space-y-4">
             {nearbyEmergency.map((facility, index) => {
               const IconComponent = facility.icon;
@@ -114,11 +119,11 @@ const Emergency = () => {
                       <div className="flex gap-2 md:flex-col">
                         <Button variant="destructive" size="lg" className="flex-1 md:flex-none">
                           <Phone className="mr-2 h-4 w-4" />
-                          Emergency Call
+                          {t('emergency.emergencyCall')}
                         </Button>
                         <Button variant="outline" size="lg" className="flex-1 md:flex-none">
                           <MapPin className="mr-2 h-4 w-4" />
-                          Get Directions
+                          {t('emergency.getDirections')}
                         </Button>
                       </div>
                     </div>
@@ -134,36 +139,22 @@ const Emergency = () => {
       <section className="border-t border-border py-12">
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-3xl">
-            <h2 className="mb-6 text-2xl font-bold text-foreground">Basic First Aid Tips</h2>
+            <h2 className="mb-6 text-2xl font-bold text-foreground">{t('emergency.tips.title')}</h2>
             <Card className="border-2 border-primary/20">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <AlertCircle className="h-6 w-6 text-primary" />
-                  While Waiting for Emergency Help
+                  {t('emergency.tips.waiting')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-3">
-                  <li className="flex gap-3">
-                    <div className="mt-1 h-2 w-2 rounded-full bg-primary" />
-                    <span className="text-muted-foreground">Stay calm and keep the patient comfortable</span>
-                  </li>
-                  <li className="flex gap-3">
-                    <div className="mt-1 h-2 w-2 rounded-full bg-primary" />
-                    <span className="text-muted-foreground">Do not move the patient if there's a serious injury</span>
-                  </li>
-                  <li className="flex gap-3">
-                    <div className="mt-1 h-2 w-2 rounded-full bg-primary" />
-                    <span className="text-muted-foreground">Stop any bleeding by applying gentle pressure</span>
-                  </li>
-                  <li className="flex gap-3">
-                    <div className="mt-1 h-2 w-2 rounded-full bg-primary" />
-                    <span className="text-muted-foreground">Keep the patient warm with a blanket</span>
-                  </li>
-                  <li className="flex gap-3">
-                    <div className="mt-1 h-2 w-2 rounded-full bg-primary" />
-                    <span className="text-muted-foreground">Note down what happened and when it occurred</span>
-                  </li>
+                  {tipsList.map((tip, index) => (
+                    <li key={index} className="flex gap-3">
+                      <div className="mt-1 h-2 w-2 rounded-full bg-primary" />
+                      <span className="text-muted-foreground">{tip}</span>
+                    </li>
+                  ))}
                 </ul>
               </CardContent>
             </Card>
@@ -173,5 +164,6 @@ const Emergency = () => {
     </div>
   );
 };
+
 
 export default Emergency;

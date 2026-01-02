@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Stethoscope, Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 const AskDoctor = () => {
   const [name, setName] = useState("");
@@ -16,14 +17,15 @@ const AskDoctor = () => {
   const [response, setResponse] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!name || !question || !category) {
       toast({
-        title: "Missing Information",
-        description: "Please fill in all fields",
+        title: t('askDoctor.messages.missing'),
+        description: t('askDoctor.messages.fillAll'),
         variant: "destructive",
       });
       return;
@@ -41,8 +43,8 @@ const AskDoctor = () => {
 
       setResponse(data.response);
       toast({
-        title: "Response Received",
-        description: "Your question has been answered by our health advisor",
+        title: t('askDoctor.messages.received'),
+        description: t('askDoctor.messages.receivedDesc'),
       });
 
       // Clear form
@@ -52,8 +54,8 @@ const AskDoctor = () => {
     } catch (error) {
       console.error('Error submitting question:', error);
       toast({
-        title: "Error",
-        description: "Failed to submit question. Please try again.",
+        title: t('askDoctor.messages.error'),
+        description: t('askDoctor.messages.errorDesc'),
         variant: "destructive",
       });
     } finally {
@@ -68,24 +70,24 @@ const AskDoctor = () => {
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
             <Stethoscope className="h-8 w-8 text-primary" />
           </div>
-          <h1 className="text-4xl font-bold text-foreground mb-2">Ask a Health Advisor</h1>
-          <p className="text-muted-foreground">Get verified health guidance for your questions</p>
+          <h1 className="text-4xl font-bold text-foreground mb-2">{t('askDoctor.title')}</h1>
+          <p className="text-muted-foreground">{t('askDoctor.subtitle')}</p>
         </div>
 
         <Card className="animate-fade-in">
           <CardHeader>
-            <CardTitle>Submit Your Question</CardTitle>
+            <CardTitle>{t('askDoctor.form.title')}</CardTitle>
             <CardDescription>
-              Our health advisors will provide general guidance. For serious concerns, please consult a healthcare professional.
+              {t('askDoctor.form.desc')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="name">Your Name</Label>
+                <Label htmlFor="name">{t('askDoctor.form.name')}</Label>
                 <Input
                   id="name"
-                  placeholder="Enter your name"
+                  placeholder={t('askDoctor.form.namePlaceholder')}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   disabled={loading}
@@ -93,27 +95,27 @@ const AskDoctor = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="category">Category</Label>
+                <Label htmlFor="category">{t('askDoctor.form.category')}</Label>
                 <Select value={category} onValueChange={setCategory} disabled={loading}>
                   <SelectTrigger id="category">
-                    <SelectValue placeholder="Select a category" />
+                    <SelectValue placeholder={t('askDoctor.form.categoryPlaceholder')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="general">General Health</SelectItem>
-                    <SelectItem value="nutrition">Nutrition</SelectItem>
-                    <SelectItem value="fitness">Fitness</SelectItem>
-                    <SelectItem value="mental">Mental Health</SelectItem>
-                    <SelectItem value="chronic">Chronic Conditions</SelectItem>
-                    <SelectItem value="preventive">Preventive Care</SelectItem>
+                    <SelectItem value="general">{t('askDoctor.categories.general')}</SelectItem>
+                    <SelectItem value="nutrition">{t('askDoctor.categories.nutrition')}</SelectItem>
+                    <SelectItem value="fitness">{t('askDoctor.categories.fitness')}</SelectItem>
+                    <SelectItem value="mental">{t('askDoctor.categories.mental')}</SelectItem>
+                    <SelectItem value="chronic">{t('askDoctor.categories.chronic')}</SelectItem>
+                    <SelectItem value="preventive">{t('askDoctor.categories.preventive')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="question">Your Question</Label>
+                <Label htmlFor="question">{t('askDoctor.form.question')}</Label>
                 <Textarea
                   id="question"
-                  placeholder="Describe your health concern or question..."
+                  placeholder={t('askDoctor.form.questionPlaceholder')}
                   value={question}
                   onChange={(e) => setQuestion(e.target.value)}
                   rows={6}
@@ -125,12 +127,12 @@ const AskDoctor = () => {
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Getting Response...
+                    {t('askDoctor.form.submitting')}
                   </>
                 ) : (
                   <>
                     <Stethoscope className="mr-2 h-4 w-4" />
-                    Submit Question
+                    {t('askDoctor.form.submit')}
                   </>
                 )}
               </Button>
@@ -139,12 +141,12 @@ const AskDoctor = () => {
             {response && (
               <Card className="mt-6 bg-primary/5 border-primary/20 animate-fade-in">
                 <CardHeader>
-                  <CardTitle className="text-lg">Health Advisor Response</CardTitle>
+                  <CardTitle className="text-lg">{t('askDoctor.response.title')}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-foreground leading-relaxed">{response}</p>
                   <p className="text-xs text-muted-foreground mt-4">
-                    ⚠️ This is general guidance. Please consult with a healthcare professional for personalized medical advice.
+                    {t('askDoctor.response.disclaimer')}
                   </p>
                 </CardContent>
               </Card>
@@ -155,5 +157,6 @@ const AskDoctor = () => {
     </div>
   );
 };
+
 
 export default AskDoctor;

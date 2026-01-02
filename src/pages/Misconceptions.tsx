@@ -2,15 +2,17 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { XCircle, CheckCircle, Droplet, ThermometerSun, Syringe, Baby, Hospital } from "lucide-react";
 
+import { useTranslation } from "react-i18next";
+
 interface Misconception {
   id: number;
   icon: typeof Syringe;
-  mythEn: string;
-  mythHi: string;
-  factEn: string;
-  factHi: string;
-  tipEn: string;
-  tipHi: string;
+  mythEn?: string;
+  mythHi?: string;
+  factEn?: string;
+  factHi?: string;
+  tipEn?: string;
+  tipHi?: string;
   videoUrl: string;
 }
 
@@ -72,12 +74,27 @@ const misconceptions: Misconception[] = [
   },
 ];
 
-const MythCard = ({ misconception }: { misconception: Misconception }) => {
+const MythCard = ({ misconception }: { misconception: any }) => {
   const [isFlipped, setIsFlipped] = useState(false);
-  const Icon = misconception.icon;
+  const { t, i18n } = useTranslation();
+
+  // Map ID to icon - we keep icons in code as they are React components
+  const getIcon = (id: number) => {
+    switch (id) {
+      case 1: return Syringe;
+      case 2: return Baby;
+      case 3: return Droplet;
+      case 4: return ThermometerSun;
+      case 5: return Hospital;
+      default: return Syringe;
+    }
+  };
+
+  const Icon = getIcon(misconception.id);
+  const isHindi = i18n.language === 'hi';
 
   return (
-    <div 
+    <div
       className="flip-card h-96 cursor-pointer perspective-1000"
       onClick={() => setIsFlipped(!isFlipped)}
     >
@@ -92,13 +109,24 @@ const MythCard = ({ misconception }: { misconception: Misconception }) => {
             <h3 className="text-xl font-bold text-destructive">Myth / गलत धारणा</h3>
           </div>
           <p className="mb-2 text-center text-lg font-semibold text-foreground">
-            {misconception.mythEn}
+            {t(`misconceptions.items.${misconception.id - 1}.myth`)}
           </p>
           <p className="text-center text-base text-muted-foreground">
-            {misconception.mythHi}
+            {/* Showing secondary language or subtitle if needed, but simplest is to show just current lang content or both if design demands. 
+                Original design showed both English and Hindi.
+                To preserve that "vernacular" feel we can show both if strictly required, but usually i18n swaps them.
+                User asked for "full vernacular language support", implies switching.
+                However, for "Myth vs Fact", showing both can be educational.
+                Let's stick to the current language for the main text to fit the card, as requested "concise to fit".
+             */}
+            {isHindi ? misconception.mythEn : t(`misconceptions.items.${misconception.id - 1}.mythHi`)}
           </p>
+          {/* If in English, we might show Hindi subtitle, if in Hindi, show English? 
+               actually, let's just stick to the active language to ensure it fits well as requested.
+           */}
+
           <p className="mt-4 text-sm text-muted-foreground italic animate-pulse">
-            👆 Tap to see the truth
+            {t('misconceptions.tapHint')}
           </p>
         </Card>
 
@@ -112,17 +140,12 @@ const MythCard = ({ misconception }: { misconception: Misconception }) => {
             <h3 className="text-xl font-bold text-secondary">Fact / सच्चाई</h3>
           </div>
           <p className="mb-2 text-center text-lg font-semibold text-foreground">
-            {misconception.factEn}
+            {t(`misconceptions.items.${misconception.id - 1}.fact`)}
           </p>
-          <p className="mb-4 text-center text-base text-muted-foreground">
-            {misconception.factHi}
-          </p>
+
           <div className="mt-2 rounded-lg bg-accent/50 p-3 border border-accent">
             <p className="mb-1 text-sm font-medium text-accent-foreground">
-              📘 {misconception.tipEn}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {misconception.tipHi}
+              📘 {t(`misconceptions.items.${misconception.id - 1}.tip`)}
             </p>
           </div>
           <a
@@ -132,7 +155,7 @@ const MythCard = ({ misconception }: { misconception: Misconception }) => {
             onClick={(e) => e.stopPropagation()}
             className="mt-4 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary-light transition-colors shadow-soft"
           >
-            ▶️ Learn More / और जानें
+            {t('misconceptions.learnMore')}
           </a>
         </Card>
       </div>
@@ -190,7 +213,7 @@ const Misconceptions = () => {
         <div className="container mx-auto px-4">
           <div className="grid gap-8 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
             {misconceptions.map((misconception, index) => (
-              <div 
+              <div
                 key={misconception.id}
                 className="animate-fade-in"
                 style={{ animationDelay: `${index * 100}ms` }}

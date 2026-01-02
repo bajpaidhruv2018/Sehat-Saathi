@@ -3,45 +3,47 @@ import { MapPin, Phone, Search, Video, MessageSquare, Hospital, Clock } from "lu
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-
-const nearbyFacilities = [
-  {
-    name: "Community Health Center",
-    type: "Primary Care",
-    distance: "2.3 km",
-    phone: "1800-XXX-XXXX",
-    hours: "24/7 Emergency",
-    services: ["General Medicine", "Emergency Care", "Lab Tests"],
-  },
-  {
-    name: "District Hospital",
-    type: "Multi-specialty",
-    distance: "8.5 km",
-    phone: "1800-YYY-YYYY",
-    hours: "24/7",
-    services: ["Surgery", "ICU", "Maternity", "Pediatrics"],
-  },
-  {
-    name: "Rural Health Clinic",
-    type: "Primary Care",
-    distance: "5.1 km",
-    phone: "1800-ZZZ-ZZZZ",
-    hours: "8 AM - 6 PM",
-    services: ["Basic Care", "Vaccination", "First Aid"],
-  },
-];
+import { useTranslation } from "react-i18next";
 
 const Healthcare = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const { t } = useTranslation();
+
+  const nearbyFacilities = [
+    {
+      name: t('healthcare.nearby.facilities.chc.name'),
+      type: t('healthcare.nearby.facilities.chc.type'),
+      distance: "2.3 km",
+      phone: "1800-XXX-XXXX",
+      hours: "24/7 Emergency",
+      services: t('healthcare.nearby.facilities.chc.services', { returnObjects: true }) as string[],
+    },
+    {
+      name: t('healthcare.nearby.facilities.district.name'),
+      type: t('healthcare.nearby.facilities.district.type'),
+      distance: "8.5 km",
+      phone: "1800-YYY-YYYY",
+      hours: "24/7",
+      services: t('healthcare.nearby.facilities.district.services', { returnObjects: true }) as string[],
+    },
+    {
+      name: t('healthcare.nearby.facilities.clinic.name'),
+      type: t('healthcare.nearby.facilities.clinic.type'),
+      distance: "5.1 km",
+      phone: "1800-ZZZ-ZZZZ",
+      hours: "8 AM - 6 PM",
+      services: t('healthcare.nearby.facilities.clinic.services', { returnObjects: true }) as string[],
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
       <section className="border-b border-border bg-gradient-to-br from-secondary/10 to-primary/10 py-12">
         <div className="container mx-auto px-4">
-          <h1 className="mb-4 text-4xl font-bold text-foreground">Find Healthcare</h1>
+          <h1 className="mb-4 text-4xl font-bold text-foreground">{t('healthcare.title')}</h1>
           <p className="max-w-2xl text-lg text-muted-foreground">
-            Locate nearby hospitals and clinics, or connect with doctors through teleconsultation
+            {t('healthcare.subtitle')}
           </p>
         </div>
       </section>
@@ -55,13 +57,13 @@ const Healthcare = () => {
                 <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
                 <Input
                   type="text"
-                  placeholder="Search for hospitals, clinics, or doctors..."
+                  placeholder={t('healthcare.search.placeholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10"
                 />
               </div>
-              <Button variant="default">Search</Button>
+              <Button variant="default">{t('healthcare.search.button')}</Button>
             </div>
           </div>
         </div>
@@ -70,7 +72,7 @@ const Healthcare = () => {
       {/* Teleconsultation Options */}
       <section className="border-b border-border py-12">
         <div className="container mx-auto px-4">
-          <h2 className="mb-6 text-2xl font-bold text-foreground">Teleconsultation Services</h2>
+          <h2 className="mb-6 text-2xl font-bold text-foreground">{t('healthcare.teleconsultation.title')}</h2>
           <div className="grid gap-4 md:grid-cols-2">
             <Card className="border-2 border-primary/20 transition-all hover:border-primary hover:shadow-soft">
               <CardHeader>
@@ -78,15 +80,15 @@ const Healthcare = () => {
                   <div className="rounded-lg bg-primary/10 p-2">
                     <Video className="h-6 w-6 text-primary" />
                   </div>
-                  Video Consultation
+                  {t('healthcare.teleconsultation.video.title')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="mb-4 text-muted-foreground">
-                  Connect with doctors via video call for detailed consultations
+                  {t('healthcare.teleconsultation.video.desc')}
                 </p>
                 <Button variant="default" className="w-full">
-                  Start Video Call
+                  {t('healthcare.teleconsultation.video.button')}
                 </Button>
               </CardContent>
             </Card>
@@ -97,15 +99,15 @@ const Healthcare = () => {
                   <div className="rounded-lg bg-secondary/10 p-2">
                     <MessageSquare className="h-6 w-6 text-secondary" />
                   </div>
-                  Chat Consultation
+                  {t('healthcare.teleconsultation.chat.title')}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="mb-4 text-muted-foreground">
-                  Chat with healthcare professionals for quick advice
+                  {t('healthcare.teleconsultation.chat.desc')}
                 </p>
                 <Button variant="secondary" className="w-full">
-                  Start Chat
+                  {t('healthcare.teleconsultation.chat.button')}
                 </Button>
               </CardContent>
             </Card>
@@ -116,7 +118,7 @@ const Healthcare = () => {
       {/* Nearby Facilities */}
       <section className="py-12">
         <div className="container mx-auto px-4">
-          <h2 className="mb-6 text-2xl font-bold text-foreground">Nearby Healthcare Facilities</h2>
+          <h2 className="mb-6 text-2xl font-bold text-foreground">{t('healthcare.nearby.title')}</h2>
           <div className="space-y-4">
             {nearbyFacilities.map((facility, index) => (
               <Card key={index} className="border-2 border-border transition-all hover:border-primary hover:shadow-card">
@@ -135,7 +137,7 @@ const Healthcare = () => {
                       <div className="ml-14 space-y-2">
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                           <MapPin className="h-4 w-4" />
-                          <span>{facility.distance} away</span>
+                          <span>{facility.distance} {t('healthcare.nearby.away')}</span>
                         </div>
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                           <Clock className="h-4 w-4" />
@@ -156,11 +158,11 @@ const Healthcare = () => {
                     <div className="flex gap-2 md:flex-col">
                       <Button variant="outline" size="sm" className="flex-1 md:flex-none">
                         <Phone className="mr-2 h-4 w-4" />
-                        Call
+                        {t('healthcare.nearby.call')}
                       </Button>
                       <Button variant="soft" size="sm" className="flex-1 md:flex-none">
                         <MapPin className="mr-2 h-4 w-4" />
-                        Directions
+                        {t('healthcare.nearby.directions')}
                       </Button>
                     </div>
                   </div>
@@ -173,5 +175,6 @@ const Healthcare = () => {
     </div>
   );
 };
+
 
 export default Healthcare;

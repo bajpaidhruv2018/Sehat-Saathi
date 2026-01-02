@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Trophy, BookOpen, Award } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 interface UserProgress {
   id: string;
@@ -28,6 +29,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [userName, setUserName] = useState("User");
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   useEffect(() => {
     fetchDashboardData();
@@ -36,11 +38,11 @@ const Dashboard = () => {
   const fetchDashboardData = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      
+
       if (!user) {
         toast({
-          title: "Authentication Required",
-          description: "Please sign in to view your dashboard",
+          title: t('dashboard.auth.title'),
+          description: t('dashboard.auth.desc'),
           variant: "destructive",
         });
         return;
@@ -61,8 +63,8 @@ const Dashboard = () => {
     } catch (error) {
       console.error('Error fetching dashboard:', error);
       toast({
-        title: "Error",
-        description: "Failed to load dashboard data",
+        title: t('dashboard.error.title'),
+        description: t('dashboard.error.desc'),
         variant: "destructive",
       });
     } finally {
@@ -90,9 +92,9 @@ const Dashboard = () => {
       <div className="container mx-auto px-4 max-w-6xl">
         <div className="mb-8 animate-fade-in">
           <h1 className="text-4xl font-bold text-foreground mb-2">
-            Welcome back, {userName}! 👋
+            {t('dashboard.welcome', { name: userName })}
           </h1>
-          <p className="text-muted-foreground">Track your health learning journey</p>
+          <p className="text-muted-foreground">{t('dashboard.track')}</p>
         </div>
 
         <div className="grid gap-6 md:grid-cols-3 mb-8">
@@ -100,7 +102,7 @@ const Dashboard = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BookOpen className="h-5 w-5 text-primary" />
-                Modules Completed
+                {t('dashboard.stats.modules')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -112,7 +114,7 @@ const Dashboard = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Trophy className="h-5 w-5 text-secondary" />
-                Badges Earned
+                {t('dashboard.stats.badges')}
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -124,13 +126,13 @@ const Dashboard = () => {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Award className="h-5 w-5 text-accent-foreground" />
-                Overall Progress
+                {t('dashboard.stats.overall')}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <Progress value={Math.min((progress.length / 10) * 100, 100)} className="h-3" />
               <p className="text-sm text-muted-foreground mt-2">
-                {progress.length} of 10 modules
+                {t('dashboard.stats.progress', { count: progress.length, total: 10 })}
               </p>
             </CardContent>
           </Card>
@@ -139,16 +141,16 @@ const Dashboard = () => {
         {recentModule && (
           <Card className="mb-8 animate-fade-in">
             <CardHeader>
-              <CardTitle>Continue Where You Left Off</CardTitle>
-              <CardDescription>Resume your learning journey</CardDescription>
+              <CardTitle>{t('dashboard.continue.title')}</CardTitle>
+              <CardDescription>{t('dashboard.continue.subtitle')}</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
                   <h3 className="font-semibold text-lg">{recentModule.module_name}</h3>
                   <p className="text-sm text-muted-foreground">{recentModule.module_category}</p>
                 </div>
-                <Badge variant="secondary">{recentModule.progress_percentage}% Complete</Badge>
+                <Badge variant="secondary" className="w-fit">{recentModule.progress_percentage}% {t('dashboard.continue.complete')}</Badge>
               </div>
             </CardContent>
           </Card>
@@ -157,8 +159,8 @@ const Dashboard = () => {
         {badges.length > 0 && (
           <Card className="animate-fade-in">
             <CardHeader>
-              <CardTitle>Your Achievements 🏆</CardTitle>
-              <CardDescription>Badges you've earned on your journey</CardDescription>
+              <CardTitle>{t('dashboard.achievements.title')}</CardTitle>
+              <CardDescription>{t('dashboard.achievements.subtitle')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -184,9 +186,9 @@ const Dashboard = () => {
         {progress.length === 0 && badges.length === 0 && (
           <Card className="text-center py-12">
             <CardContent>
-              <p className="text-muted-foreground mb-4">Start your health learning journey today!</p>
+              <p className="text-muted-foreground mb-4">{t('dashboard.empty.title')}</p>
               <p className="text-sm text-muted-foreground">
-                Complete modules to earn badges and track your progress
+                {t('dashboard.empty.subtitle')}
               </p>
             </CardContent>
           </Card>
@@ -195,5 +197,6 @@ const Dashboard = () => {
     </div>
   );
 };
+
 
 export default Dashboard;

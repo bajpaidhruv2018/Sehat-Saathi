@@ -1,5 +1,5 @@
 import { Phone } from "lucide-react";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { useTranslation } from "react-i18next";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -13,8 +13,8 @@ import {
 } from "@/components/ui/alert-dialog";
 
 const SOSButton = () => {
-  const { t } = useLanguage();
-  
+  const { t } = useTranslation();
+
   const handleEmergencyCall = () => {
     window.location.href = "tel:108";
   };
@@ -42,17 +42,17 @@ const SOSButton = () => {
             {t('sos.calling')}
             <br />
             <span className="font-semibold text-foreground mt-2 block">
-              This will dial 108 (Emergency Services)
+              {t('sos.warning')}
             </span>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="gap-2 sm:gap-2">
-          <AlertDialogCancel className="m-0">Cancel</AlertDialogCancel>
+          <AlertDialogCancel className="m-0">{t('sos.cancel')}</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleEmergencyCall}
             className="bg-red-600 hover:bg-red-700 m-0"
           >
-            Yes, Call Now
+            {t('sos.confirm')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

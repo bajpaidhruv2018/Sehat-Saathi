@@ -1,65 +1,60 @@
 import { useState } from "react";
-import { Droplets, Syringe, Apple, Pill, Shield, Baby, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { Droplets, Syringe, Apple, Pill, Shield, Baby } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 
 const educationTopics = [
   {
+    id: 'hygiene',
     icon: Droplets,
-    title: "Hygiene & Sanitation",
-    description: "Learn proper handwashing, water purification, and keeping your environment clean",
     color: "bg-blue-500",
-    topics: ["Handwashing techniques", "Safe water practices", "Food hygiene", "Waste disposal"],
   },
   {
+    id: "vaccination",
     icon: Syringe,
-    title: "Vaccination",
-    description: "Understanding vaccines, schedules, and importance for children and adults",
     color: "bg-green-500",
-    topics: ["Childhood vaccines", "Adult immunization", "Vaccine safety", "Schedule tracking"],
   },
   {
+    id: "nutrition",
     icon: Apple,
-    title: "Nutrition & Diet",
-    description: "Balanced diet, nutritional needs, and healthy eating habits for all ages",
     color: "bg-orange-500",
-    topics: ["Balanced meals", "Child nutrition", "Maternal health", "Food groups"],
   },
   {
+    id: "commonDiseases",
     icon: Pill,
-    title: "Common Diseases",
-    description: "Prevention, symptoms, and treatment of common illnesses in rural areas",
     color: "bg-red-500",
-    topics: ["Fever management", "Diarrhea treatment", "Cold & flu", "Skin infections"],
   },
   {
+    id: "diseasePrevention",
     icon: Shield,
-    title: "Disease Prevention",
-    description: "Simple steps to prevent common diseases and maintain good health",
     color: "bg-purple-500",
-    topics: ["Mosquito protection", "Clean drinking water", "Personal hygiene", "Immunity boost"],
   },
   {
+    id: "motherChild",
     icon: Baby,
-    title: "Mother & Child Care",
-    description: "Essential care during pregnancy, childbirth, and early childhood",
     color: "bg-pink-500",
-    topics: ["Prenatal care", "Safe delivery", "Breastfeeding", "Baby care"],
   },
 ];
 
 const Education = () => {
-  const [selectedTopic, setSelectedTopic] = useState<typeof educationTopics[0] | null>(null);
+  const { t } = useTranslation();
+  const [selectedTopic, setSelectedTopic] = useState<any>(null);
+
+  const getTopicData = (id: string) => ({
+    title: t(`education.items.${id}.title`),
+    description: t(`education.items.${id}.desc`),
+    topics: t(`education.items.${id}.sub`, { returnObjects: true }) as string[],
+  });
 
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
       <section className="border-b border-border bg-gradient-to-br from-primary/10 to-secondary/10 py-12">
         <div className="container mx-auto px-4">
-          <h1 className="mb-4 text-4xl font-bold text-foreground">Health Education</h1>
+          <h1 className="mb-4 text-4xl font-bold text-foreground">{t('education.headerTitle')}</h1>
           <p className="max-w-2xl text-lg text-muted-foreground">
-            Learn essential health topics in simple language with visual guides. Tap any card to explore detailed information.
+            {t('education.headerDesc')}
           </p>
         </div>
       </section>
@@ -70,10 +65,11 @@ const Education = () => {
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {educationTopics.map((topic, index) => {
               const IconComponent = topic.icon;
+              const data = getTopicData(topic.id);
               return (
                 <Card
                   key={index}
-                  onClick={() => setSelectedTopic(topic)}
+                  onClick={() => setSelectedTopic({ ...topic, ...data })}
                   className="group cursor-pointer overflow-hidden border-2 border-border transition-all duration-300 hover:scale-105 hover:border-primary hover:shadow-soft"
                 >
                   <CardHeader>
@@ -81,15 +77,15 @@ const Education = () => {
                       <div className={`rounded-xl ${topic.color} p-3 shadow-md`}>
                         <IconComponent className="h-8 w-8 text-white" />
                       </div>
-                      <CardTitle className="text-xl">{topic.title}</CardTitle>
+                      <CardTitle className="text-xl">{data.title}</CardTitle>
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <p className="mb-4 text-muted-foreground">{topic.description}</p>
+                    <p className="mb-4 text-muted-foreground">{data.description}</p>
                     <div className="space-y-2">
-                      <p className="text-sm font-semibold text-foreground">Topics covered:</p>
+                      <p className="text-sm font-semibold text-foreground">{t('education.topicsCovered')}</p>
                       <ul className="space-y-1">
-                        {topic.topics.map((item, i) => (
+                        {data.topics.map((item, i) => (
                           <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
                             <div className="h-1.5 w-1.5 rounded-full bg-primary" />
                             {item}
@@ -110,10 +106,10 @@ const Education = () => {
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-3xl text-center">
             <h2 className="mb-4 text-2xl font-bold text-foreground">
-              All Content Available Offline
+              {t('education.offlineTitle')}
             </h2>
             <p className="text-muted-foreground">
-              Once you've opened a topic, the information is saved on your device and can be accessed even without internet connection.
+              {t('education.offlineDesc')}
             </p>
           </div>
         </div>
@@ -135,24 +131,24 @@ const Education = () => {
                   <DialogTitle className="text-2xl">{selectedTopic.title}</DialogTitle>
                 </div>
               </DialogHeader>
-              
+
               <div className="mt-4 space-y-6">
                 <div>
-                  <h3 className="mb-2 text-lg font-semibold">Overview</h3>
+                  <h3 className="mb-2 text-lg font-semibold">{t('education.overview')}</h3>
                   <p className="text-muted-foreground">{selectedTopic.description}</p>
                 </div>
 
                 <div>
-                  <h3 className="mb-3 text-lg font-semibold">Topics Covered</h3>
+                  <h3 className="mb-3 text-lg font-semibold">{t('education.covered')}</h3>
                   <div className="space-y-3">
-                    {selectedTopic.topics.map((item, i) => (
+                    {selectedTopic.topics.map((item: string, i: number) => (
                       <div key={i} className="rounded-lg border border-border bg-muted/50 p-4">
                         <div className="flex items-start gap-3">
                           <div className="mt-1 h-2 w-2 rounded-full bg-primary flex-shrink-0" />
                           <div>
                             <p className="font-medium">{item}</p>
                             <p className="mt-1 text-sm text-muted-foreground">
-                              Detailed information about {item.toLowerCase()} and best practices.
+                              {t('education.items.hygiene.subDesc')} {item.toLowerCase()}...
                             </p>
                           </div>
                         </div>
@@ -163,7 +159,7 @@ const Education = () => {
 
                 <div className="rounded-lg bg-primary/10 p-4">
                   <p className="text-sm text-muted-foreground">
-                    💡 This content is now saved offline and can be accessed without internet connection.
+                    {t('education.offlineNote')}
                   </p>
                 </div>
               </div>
