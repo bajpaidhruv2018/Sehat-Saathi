@@ -3,14 +3,15 @@ import React from "react";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { useEffect } from "react";
+import { speechService } from "./services/SpeechService";
 import Navbar from "./components/Navbar";
 import SOSButton from "./components/SOSButton";
 import WelcomePopup from "./components/WelcomePopup";
 import HealthChatbot from "./components/HealthChatbot";
-import { GlobalTTSPlayer } from "./components/GlobalTTSPlayer";
 import Home from "./pages/Home";
 import Education from "./pages/Education";
 import Healthcare from "./pages/Healthcare";
@@ -25,6 +26,18 @@ import HealthTipsBanner from "./components/HealthTipsBanner";
 
 const queryClient = new QueryClient();
 
+// Component to handle navigation side-effects
+const StopSpeakingOnNavigation = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    speechService.stop();
+  }, [location]);
+
+  return null;
+};
+
+
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
@@ -34,6 +47,7 @@ const App = () => {
             <Toaster />
             <Sonner />
             <BrowserRouter>
+              <StopSpeakingOnNavigation />
               <div className="flex min-h-screen flex-col">
                 <Navbar />
                 <HealthTipsBanner />
@@ -57,7 +71,6 @@ const App = () => {
                 <SOSButton />
                 <WelcomePopup />
                 <HealthChatbot />
-                <GlobalTTSPlayer />
               </div>
             </BrowserRouter>
           </TooltipProvider>

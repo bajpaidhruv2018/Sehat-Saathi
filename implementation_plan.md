@@ -1,42 +1,32 @@
-# Implementation Plan - i18n Scalability & Pan-India Expansion
+# TTS Overhaul - Voice Tuning
 
 ## Goal Description
-Scale the i18n implementation to support 5 additional major Indian languages (Bengali, Telugu, Tamil, Odia, Punjabi), utilizing correct native scripts and ensuring UI robustness for variable text lengths.
+Improve the `SpeechService` to strictly select Indian vernacular voices and avoid defaulting to British/American English accents when a specific language voice is missing.
+
+## User Review Required
+> [!IMPORTANT]
+> If a requested language voice (e.g., Odia) is missing, the system will now remain silent or show a warning instead of reading in English. This is a design change to prevent "wrong accent" issues.
 
 ## Proposed Changes
 
 ### Infrastructure
-#### [MODIFY] [i18n.ts](file:///c:/College/hackathons/SehatSaathi/remote-well-reach/src/i18n.ts)
-- Add `bn`, `te`, `ta`, `or`, `pa` to `supportedLngs`.
-
-#### [MODIFY] [LanguageSwitcher.tsx](file:///c:/College/hackathons/SehatSaathi/remote-well-reach/src/components/LanguageSwitcher.tsx)
-- Add new languages to the `languages` array with native labels:
-    - Bengali: বাংলা
-    - Telugu: తెలుగు
-    - Tamil: தமிழ்
-    - Odia: ଓଡ଼ିଆ
-    - Punjabi: ਪੰਜਾਬੀ
-
-### Translations
-#### [NEW] Translation Files
-- `public/locales/bn/translation.json`
-- `public/locales/te/translation.json`
-- `public/locales/ta/translation.json`
-- `public/locales/or/translation.json`
-- `public/locales/pa/translation.json`
-- **Quality**: Empathetic, layman-friendly healthcare terminology.
-
-### UI Hardening
-#### [MODIFY] [Home.tsx](file:///c:/College/hackathons/SehatSaathi/remote-well-reach/src/pages/Home.tsx)
-- Myth Cards: Ensure `min-height` or flexible layouts to handle text expansion (especially for South Indian scripts).
-
-#### [MODIFY] [Education.tsx](file:///c:/College/hackathons/SehatSaathi/remote-well-reach/src/pages/Education.tsx)
-- Topic Cards: Check for title/description overflow.
+#### [MODIFY] [SpeechService.ts](file:///c:/College/hackathons/SehatSaathi/remote-well-reach/src/services/SpeechService.ts)
+- **Pre-fetch**: Ensure `getVoices()` is called immediately and listens to `onvoiceschanged`.
+- **Selection Logic**:
+    1.  Map i18n code to ISO (e.g., `te` -> `te-IN`).
+    2.  Search for exact `lang` match (e.g., `te-IN`).
+    3.  Search for "Google" voices with that `lang` (e.g., `Google Telugu`).
+    4.  Search for any voice starting with the short code (e.g., `te`).
+- **Fallback Logic**:
+    -   **Marathi (`mr`)**: If no Marathi voice, try `hi-IN` (Hindi).
+    -   **Others**: If no voice found, **Log Warning/Show Toast** and **Do Not Speak**.
+- **Native Detection**: Strictly use `i18n.language`.
 
 ## Verification Plan
-- **Automated**: Verify `i18n` initializes with new languages.
-- **Manual**:
-    - Switch to each new language.
-    - Inspect "Myth" cards for layout breakage.
-    - Inspect "Education" cards for layout breakage.
-    - Verify Native Script rendering in the dropdown.
+### Automated Tests
+- Unit tests not applicable in this environment.
+
+### Manual Verification
+1.  **Console Logging**: Verify logs show "Selected voice: Google Telugu" or "No voice found for or-IN".
+2.  **Language Switching**: Switch to Telugu -> Click Audio Icon -> Verify not English.
+3.  **Fallback**: Switch to Marathi -> Disable Marathi voice (simulated) -> Verify Hindi voice used.

@@ -36,3 +36,23 @@
     - [x] Audit 'Health Education' cards for text overflow with longer scripts (Tamil/Telugu).
     - [x] Audit 'Myth vs Fact' flip-cards for content fitting.
 
+# Phase 3: Text-to-Speech Overhaul
+- [x] **Infrastructure & Utilities**
+    - [x] Create `src/services/SpeechService.ts` (Singleton, Language-Aware).
+    - [x] Create `src/hooks/useLongPressSpeech.ts`.
+
+- [x] **New Components**
+    - [x] Create `src/components/ui/AudioIcon.tsx`.
+
+- [x] **Integration**
+    - [x] Integrate AudioIcon into `Misconceptions.tsx` (Myths/Facts).
+    - [x] Integrate AudioIcon into `Education.tsx` (Cards).
+    - [x] Implement Long-Press for `Home.tsx` buttons.
+    - [x] Cleanup: Remove `GlobalTTSPlayer.tsx` and `TTSButton.tsx`.
+    - [x] Global: Stop audio on route change.
+
+- [x] **Voice Tuning & Robustness**
+    - [x] Robust Voice Selection (ISO mapping, Google voice preference).
+    - [x] Regional Fallback (Marathi -> Hindi).
+    - [x] "No Voice" Warning (Toast/Console).
+    - [x] Pre-fetch `getVoices` on app load.

@@ -1,14 +1,100 @@
 import { Link, useLocation } from "react-router-dom";
 import { Heart, Menu } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { cn } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
+import { useLongPressSpeech } from "@/hooks/useLongPressSpeech";
+import React, { useState, useRef } from "react";
+
+const MAGNETIC_DISTANCE = 6;
+
+const NavButtonWithSpeech = ({ item, isActive, className, children, to, ...props }: any) => {
+  const { t } = useTranslation();
+  const { onClick, ...handlers } = useLongPressSpeech({
+    textToSpeak: t('tts.buttonDesc', { label: item.name })
+  });
+
+  // Magnetic & Spotlight Logic (Ported from Button.tsx)
+  const [magneticStyle, setMagneticStyle] = useState({});
+  const [spotlightStyle, setSpotlightStyle] = useState({});
+  const ref = useRef<HTMLAnchorElement>(null);
+  const isMagnetic = !props.disabled;
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!isMagnetic || window.innerWidth < 768) return;
+
+    const element = ref.current;
+    if (!element) return;
+
+    const rect = element.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+
+    const distance = Math.sqrt(x * x + y * y);
+    const maxDistance = Math.max(rect.width, rect.height) / 2;
+    const factor = Math.min(distance / maxDistance, 1);
+
+    const translateX = (x / maxDistance) * MAGNETIC_DISTANCE * (1 - factor);
+    const translateY = (y / maxDistance) * MAGNETIC_DISTANCE * (1 - factor);
+
+    setMagneticStyle({
+      transform: `translate(${translateX}px, ${translateY}px)`,
+    });
+
+    setSpotlightStyle({
+      background: `radial-gradient(circle at ${e.clientX - rect.left}px ${e.clientY - rect.top}px, rgba(255,255,255,0.2), transparent 65%)`,
+    });
+  };
+
+  const handleMouseLeave = () => {
+    setMagneticStyle({});
+    setSpotlightStyle({});
+    // Also clear from useLongPressSpeech if needed? 
+    // hook handles its own leave via handlers.onMouseLeave, so we compose them.
+    if (handlers.onMouseLeave) {
+      handlers.onMouseLeave(null as any);
+    }
+  };
+
+  return (
+    <Link
+      to={to}
+      ref={ref}
+      className={cn(
+        buttonVariants({
+          variant: isActive ? "default" : "ghost",
+          size: "sm"
+        }),
+        "relative overflow-hidden", // Needed for spotlight positioning
+        className
+      )}
+      onClick={onClick}
+      style={magneticStyle}
+      onMouseMove={handleMouseMove}
+      {...handlers}
+      onMouseLeave={(e) => {
+        handleMouseLeave();
+        handlers.onMouseLeave(e);
+      }}
+      {...props}
+    >
+      {isMagnetic && (
+        <span
+          className="absolute inset-0 pointer-events-none transition-all duration-150"
+          style={spotlightStyle}
+        />
+      )}
+      {children}
+    </Link>
+  );
+};
 
 const Navbar = () => {
   const location = useLocation();
-  const { t } = useLanguage();
+  const { t } = useTranslation();
 
   const navItems = [
     { name: t('nav.home'), path: "/" },
@@ -33,24 +119,21 @@ const Navbar = () => {
         </Link>
 
         {/* DESKTOP NAVIGATION */}
-        {/* Changed 'md:flex' to 'xl:flex' so it only appears on large screens */}
-        {/* Reduced 'gap-2' to 'gap-1' to save space */}
         <div className="hidden items-center gap-1 xl:flex">
           {navItems.map((item) => (
-            <Link key={item.path} to={item.path}>
-              <Button
-                variant={location.pathname === item.path ? "default" : "ghost"}
-                size="sm"
-                // Added 'text-xs' and reduced horizontal padding 'px-3'
-                className={`font-medium h-9 px-3 text-xs transition-all duration-300 ${item.special
-                    ? "bg-gradient-to-r from-primary to-secondary text-white hover:shadow-lg hover:scale-105 animate-pulse-slow border-2 border-transparent hover:border-primary/50"
-                    : ""
-                  }`}
-              >
-                {item.name}
-                {item.special && <span className="ml-1 text-[10px]">✨</span>}
-              </Button>
-            </Link>
+            <NavButtonWithSpeech
+              key={item.path}
+              item={item}
+              to={item.path}
+              isActive={location.pathname === item.path}
+              className={`font-medium h-9 px-3 text-xs transition-all duration-300 ${item.special
+                ? "bg-gradient-to-r from-primary to-secondary text-white hover:shadow-lg hover:scale-105 animate-pulse-slow border-2 border-transparent hover:border-primary/50"
+                : ""
+                }`}
+            >
+              {item.name}
+              {item.special && <span className="ml-1 text-[10px]">✨</span>}
+            </NavButtonWithSpeech>
           ))}
 
           <div className="flex items-center gap-1 ml-2 pl-2 border-l border-border">
@@ -60,7 +143,6 @@ const Navbar = () => {
         </div>
 
         {/* MOBILE NAVIGATION */}
-        {/* Changed 'md:hidden' to 'xl:hidden' so this stays visible on tablets/landscape */}
         <div className="flex items-center gap-2 xl:hidden">
           <LanguageSwitcher />
           <ThemeToggle />
@@ -73,18 +155,19 @@ const Navbar = () => {
             <SheetContent side="right" className="w-[300px] sm:w-[400px] overflow-y-auto">
               <div className="mt-8 flex flex-col gap-4">
                 {navItems.map((item) => (
-                  <Link key={item.path} to={item.path}>
-                    <Button
-                      variant={location.pathname === item.path ? "default" : "ghost"}
-                      className={`w-full justify-start text-lg transition-all duration-300 ${item.special
-                          ? "bg-gradient-to-r from-primary to-secondary text-white hover:shadow-lg border-2 border-transparent hover:border-primary/50"
-                          : ""
-                        }`}
-                    >
-                      {item.name}
-                      {item.special && <span className="ml-2">✨</span>}
-                    </Button>
-                  </Link>
+                  <NavButtonWithSpeech
+                    key={item.path}
+                    item={item}
+                    to={item.path}
+                    isActive={location.pathname === item.path}
+                    className={`w-full justify-start text-lg transition-all duration-300 ${item.special
+                      ? "bg-gradient-to-r from-primary to-secondary text-white hover:shadow-lg border-2 border-transparent hover:border-primary/50"
+                      : ""
+                      }`}
+                  >
+                    {item.name}
+                    {item.special && <span className="ml-2">✨</span>}
+                  </NavButtonWithSpeech>
                 ))}
               </div>
             </SheetContent>

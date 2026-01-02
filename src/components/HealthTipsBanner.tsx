@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { useTranslation } from "react-i18next";
-import { TTSButton } from "./TTSButton";
+import { AudioIcon } from "@/components/ui/AudioIcon";
 
 interface HealthTip {
   id: string;
@@ -60,7 +60,7 @@ const HealthTipsBanner = ({ }: HealthTipsBannerProps) => {
           <p className="text-sm md:text-base font-medium text-foreground text-center">
             {displayText}
           </p>
-          <TTSButton text={displayText} />
+          <AudioIcon text={displayText} />
         </div>
       </div>
     </div>

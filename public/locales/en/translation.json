@@ -446,7 +446,8 @@
     },
     "tts": {
         "readAloud": "Read Aloud",
-        "stop": "Stop"
+        "stop": "Stop",
+        "buttonDesc": "This button is for {{label}}"
     },
     "dashboard": {
         "title": "My Progress",

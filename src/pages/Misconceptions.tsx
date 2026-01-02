@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { XCircle, CheckCircle, Droplet, ThermometerSun, Syringe, Baby, Hospital } from "lucide-react";
+import { AudioIcon } from "@/components/ui/AudioIcon";
 
 import { useTranslation } from "react-i18next";
 
@@ -93,6 +94,20 @@ const MythCard = ({ misconception }: { misconception: any }) => {
   const Icon = getIcon(misconception.id);
   const isHindi = i18n.language === 'hi';
 
+  // Helper to get text content
+  const mythText = t(`misconceptions.items.${misconception.id - 1}.myth`);
+  const factText = t(`misconceptions.items.${misconception.id - 1}.fact`);
+  const tipText = t(`misconceptions.items.${misconception.id - 1}.tip`);
+  const vernacularMyth = isHindi ? misconception.mythEn : t(`misconceptions.items.${misconception.id - 1}.mythHi`);
+
+  const handleAudioClick = (e: React.MouseEvent, text: string) => {
+    e.stopPropagation(); // Prevent card flip
+    // AudioIcon handles the speak call internally, but we need to stop propagation here effectively
+    // Actually AudioIcon already does stopPropagation.
+    // But since the parent div has onClick, we need to be careful.
+    // The AudioIcon component does e.stopPropagation().
+  };
+
   return (
     <div
       className="flip-card h-96 cursor-pointer perspective-1000"
@@ -108,22 +123,15 @@ const MythCard = ({ misconception }: { misconception: any }) => {
             <XCircle className="h-6 w-6 text-destructive" />
             <h3 className="text-xl font-bold text-destructive">Myth / गलत धारणा</h3>
           </div>
-          <p className="mb-2 text-center text-lg font-semibold text-foreground">
-            {t(`misconceptions.items.${misconception.id - 1}.myth`)}
-          </p>
+          <div className="flex flex-col items-center gap-2 mb-2 w-full">
+            <p className="text-center text-lg font-semibold text-foreground">
+              {mythText}
+            </p>
+            <AudioIcon text={mythText} className="hover:bg-destructive/10 text-destructive" />
+          </div>
           <p className="text-center text-base text-muted-foreground">
-            {/* Showing secondary language or subtitle if needed, but simplest is to show just current lang content or both if design demands. 
-                Original design showed both English and Hindi.
-                To preserve that "vernacular" feel we can show both if strictly required, but usually i18n swaps them.
-                User asked for "full vernacular language support", implies switching.
-                However, for "Myth vs Fact", showing both can be educational.
-                Let's stick to the current language for the main text to fit the card, as requested "concise to fit".
-             */}
-            {isHindi ? misconception.mythEn : t(`misconceptions.items.${misconception.id - 1}.mythHi`)}
+            {vernacularMyth}
           </p>
-          {/* If in English, we might show Hindi subtitle, if in Hindi, show English? 
-               actually, let's just stick to the active language to ensure it fits well as requested.
-           */}
 
           <p className="mt-4 text-sm text-muted-foreground italic animate-pulse">
             {t('misconceptions.tapHint')}
@@ -139,14 +147,20 @@ const MythCard = ({ misconception }: { misconception: any }) => {
             <CheckCircle className="h-6 w-6 text-secondary" />
             <h3 className="text-xl font-bold text-secondary">Fact / सच्चाई</h3>
           </div>
-          <p className="mb-2 text-center text-lg font-semibold text-foreground">
-            {t(`misconceptions.items.${misconception.id - 1}.fact`)}
-          </p>
-
-          <div className="mt-2 rounded-lg bg-accent/50 p-3 border border-accent">
-            <p className="mb-1 text-sm font-medium text-accent-foreground">
-              📘 {t(`misconceptions.items.${misconception.id - 1}.tip`)}
+          <div className="flex flex-col items-center gap-2 mb-2 w-full">
+            <p className="text-center text-lg font-semibold text-foreground">
+              {factText}
             </p>
+            <AudioIcon text={factText} className="hover:bg-secondary/10 text-secondary" />
+          </div>
+
+          <div className="mt-2 w-full rounded-lg bg-accent/50 p-3 border border-accent">
+            <div className="flex items-start justify-between gap-2">
+              <p className="mb-1 text-sm font-medium text-accent-foreground">
+                📘 {tipText}
+              </p>
+              <AudioIcon text={tipText} className="h-6 w-6 shrink-0" />
+            </div>
           </div>
           <a
             href={misconception.videoUrl}

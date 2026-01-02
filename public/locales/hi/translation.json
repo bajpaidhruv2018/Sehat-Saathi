@@ -446,7 +446,8 @@
     },
     "tts": {
         "readAloud": "जोर से पढ़ें",
-        "stop": "रोकें"
+        "stop": "रोकें",
+        "buttonDesc": "यह बटन {{label}} के लिए है"
     },
     "dashboard": {
         "title": "मेरी प्रगति",

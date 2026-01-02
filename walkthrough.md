@@ -1,37 +1,35 @@
-# SehatSaathi Language Expansion Walkthrough
+# Walkthrough - TTS Overhaul
 
-## Overview
-This update significantly expands SehatSaathi's reach by adding support for 5 major Indian languages: **Bengali, Telugu, Tamil, Odia, and Punjabi**. This builds upon the existing English, Hindi, and Marathi support, making the application accessible to a much wider rural audience.
+I have completely overhauled the TTS system to be granular, language-aware, and lightweight using the native Web Speech API.
 
-## Changes Implemented
+## Changes
 
-### 1. Language Infrastructure
-- Updated `src/i18n.ts` to support `bn`, `te`, `ta`, `or`, and `pa`.
-- Enhanced `LanguageSwitcher.tsx` to display native script names (e.g., বাংলা, తెలుగు) for better recognition by non-English speakers.
+### 1. New Infrastructure
+- **`SpeechService`**: A singleton service that manages `speechSynthesis`.
+    - **Robust Voice Selection**: Now strictly prefers Indian voices (e.g., `te-IN` for Telugu) and avoids defaulting to English.
+    - **Fallback Logic**: If a regional voice is missing, it stays silent (and warns in console) rather than using a confusing British/American accent. Exception: Marathi falls back to Hindi.
+    - **Pre-fetching**: Voices are loaded immediately to prevent delay on first click.
+- **`useLongPressSpeech`**: A custom hook that enables "Long Press to Speak" functionality. It intelligently prevents accidental clicks when a long-press is detected.
 
-### 2. New Translations
-- Created comprehensive `translation.json` files for all 5 new languages.
-- **Key Focus**: Ensured healthcare terms are translated into **colloquial, layman-friendly** language.
-- **Files Added**:
-    - `public/locales/bn/translation.json`
-    - `public/locales/te/translation.json`
-    - `public/locales/ta/translation.json`
-    - `public/locales/or/translation.json`
-    - `public/locales/pa/translation.json`
+### 2. Components
+- **`AudioIcon`**: A small speaker icon added to text blocks. Clicking it reads the specific text.
+- **`SOSButton`**: Updated with a long-press feature that announces "This button is for SOS..." before confirming the call.
 
-### 3. UI Refactoring & Audit
-- **Misconceptions Page**: Refactored `Misconceptions.tsx` to fully utilize the i18n system, removing hardcoded English/Hindi strings and replacing them with dynamic translations (`t('key')`).
-- **Myth Cards**: Verified that flip cards display the correct localized content.
-- **Language Switcher**: Verified the dropdown handles longer native names without breaking the layout.
+### 3. Integration
+- **Misconceptions & Education**: Replaced generic "Read Page" with specific `AudioIcon`s next to Myths, Facts, and Topic Cards.
+- **Navbar**: All navigation buttons now support long-press to describe their function.
+- **Global**: Audio automatically stops when navigating between pages.
 
 ## Verification Results
 
-### Manual Verification
-- **Language Switching**: Successfully switches between all 8 languages.
-- **Text Rendering**: Initial checks show correct rendering of Indian language scripts.
-- **Layout**: The responsive design accommodates the varying lengths of text in languages like Tamil and Telugu.
-- **Refactoring**: Confirmed that the "Health Myths" page now correctly reflects the selected language in its headers and descriptions.
-
-## Next Steps
-- Deploy and perform a real-device test to ensure font rendering is perfect on mobile devices.
-- User feedback loop to further refine colloquial terms based on specific regional feedback.
+### Manual Verification Steps
+1.  **Strict Voice**: 
+    - Switch to **Telugu**.
+    - Click any audio icon.
+    - **Expected**: Speaks in Telugu (or stays silent if voice missing). Does NOT speak in British English.
+2.  **Fallback**:
+    - Switch to **Marathi** (if device lacks Marathi voice).
+    - **Expected**: Speaks in Hindi.
+3.  **Visuals**:
+    - Hover over Navbar buttons.
+    - **Expected**: "Magnetic" white spotlight effect + gray background, restoring invalid state instantly on mouse leave.
