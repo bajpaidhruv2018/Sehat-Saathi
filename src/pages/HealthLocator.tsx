@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { MapPin, Phone, Navigation, Star, AlertCircle } from "lucide-react";
@@ -16,9 +17,14 @@ interface Hospital {
   };
   rating?: number;
   isOpen?: boolean;
+  eta?: string;
 }
 
 const HealthLocator = () => {
+  const [searchParams] = useSearchParams();
+  const specialty = searchParams.get('specialty');
+  const severity = searchParams.get('severity');
+
   const [hospitals, setHospitals] = useState<Hospital[]>([]);
   const [selectedHospital, setSelectedHospital] = useState<Hospital | null>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -112,13 +118,24 @@ const HealthLocator = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke('nearby-hospitals', {
-        body: { latitude: lat, longitude: lng, radius: 5000 }
+        body: {
+          latitude: lat,
+          longitude: lng,
+          radius: 5000,
+          specialty: specialty,
+          rankBy: (severity === 'high' || specialty) ? 'distance' : undefined
+        }
       });
 
       if (error) throw error;
 
       setHospitals(data.hospitals);
       displayHospitalsOnMap(data.hospitals);
+
+      // Calculate ETAs if we have user location
+      if (lat && lng && data.hospitals.length > 0) {
+        calculateETAs(lat, lng, data.hospitals);
+      }
     } catch (error) {
       console.error('Error fetching hospitals:', error);
       setError(t('locator.error'));
@@ -132,12 +149,44 @@ const HealthLocator = () => {
     }
   };
 
+  const calculateETAs = (lat: number, lng: number, hospitalList: Hospital[]) => {
+    if (!window.google) return;
+
+    const service = new google.maps.DistanceMatrixService();
+    const destinations = hospitalList.map(h => ({ lat: h.location.lat, lng: h.location.lng }));
+
+    service.getDistanceMatrix(
+      {
+        origins: [{ lat, lng }],
+        destinations: destinations,
+        travelMode: google.maps.TravelMode.DRIVING,
+      },
+      (response, status) => {
+        if (status === 'OK' && response) {
+          const updatedHospitals = hospitalList.map((hospital, index) => {
+            const element = response.rows[0].elements[index];
+            return {
+              ...hospital,
+              eta: element.status === 'OK' ? element.duration.text : undefined
+            };
+          });
+          setHospitals(updatedHospitals);
+          // Refresh markers with new info if needed, but for now just updating list state
+        }
+      }
+    );
+  };
+
   const displayHospitalsOnMap = (hospitals: Hospital[]) => {
     if (!mapInstanceRef.current) return;
 
     // Clear existing markers
     markersRef.current.forEach(marker => marker.setMap(null));
     markersRef.current = [];
+
+    // Determine marker color based on severity
+    // High Severity = Red (#DC2626), Standard = Blue (#4285F4)
+    const markerColor = severity === 'high' ? "#DC2626" : "#4285F4";
 
     // Add hospital markers
     hospitals.forEach((hospital) => {
@@ -147,7 +196,7 @@ const HealthLocator = () => {
         icon: {
           path: google.maps.SymbolPath.CIRCLE,
           scale: 8,
-          fillColor: "#DC2626",
+          fillColor: markerColor,
           fillOpacity: 1,
           strokeColor: "#ffffff",
           strokeWeight: 2,
@@ -263,6 +312,13 @@ const HealthLocator = () => {
                     <CardContent className="p-4">
                       <h3 className="font-semibold text-lg mb-2">{hospital.name}</h3>
                       <p className="text-sm text-muted-foreground mb-2">{hospital.address}</p>
+
+                      {hospital.eta && (
+                        <div className={`text-sm font-bold mb-2 ${severity === 'high' ? 'text-red-600' : 'text-blue-600'}`}>
+                          ⏱️ {hospital.eta} away
+                        </div>
+                      )}
+
 
                       <div className="flex items-center gap-4 mb-3">
                         {hospital.rating && (

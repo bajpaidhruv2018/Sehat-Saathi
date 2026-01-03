@@ -11,23 +11,36 @@ serve(async (req) => {
   }
 
   try {
-    const { latitude, longitude, radius = 5000 } = await req.json();
+    const { latitude, longitude, radius = 5000, specialty, rankBy } = await req.json();
 
     if (!latitude || !longitude) {
       throw new Error('Latitude and longitude are required');
     }
 
     const GOOGLE_MAPS_API_KEY = Deno.env.get('GOOGLE_MAPS_API_KEY');
-    
+
     if (!GOOGLE_MAPS_API_KEY) {
       throw new Error('Google Maps API key not configured');
     }
 
     // Use Google Places API to find nearby hospitals
-    const placesUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&radius=${radius}&type=hospital&key=${GOOGLE_MAPS_API_KEY}`;
+    let placesUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${latitude},${longitude}&type=hospital&key=${GOOGLE_MAPS_API_KEY}`;
+
+    // Add specialty as keyword if provided
+    if (specialty) {
+      placesUrl += `&keyword=${encodeURIComponent(specialty)}`;
+    }
+
+    // Handle ranking logic
+    if (rankBy === 'distance') {
+      placesUrl += `&rankby=distance`;
+      // Note: radius must NOT be included when rankby=distance
+    } else {
+      placesUrl += `&radius=${radius}`;
+    }
 
     const response = await fetch(placesUrl);
-    
+
     if (!response.ok) {
       const error = await response.text();
       console.error('Google Places API error:', error);

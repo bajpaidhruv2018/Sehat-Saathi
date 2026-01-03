@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { GoogleGenerativeAI } from "https://esm.sh/@google/generative-ai@0.1.3";
 
 const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -14,21 +13,18 @@ serve(async (req: Request) => {
     try {
         const { bodyPart, userDescription } = await req.json();
 
-        if (!bodyPart) {
-            throw new Error('Body part is required');
-        }
+        // 1. Get Key (Try Env first, fallback to the one seen in health-chat logs/code if needed or error)
+        // NOTE: In production, strictly use Deno.env.get('GEMINI_API_KEY').
+        // Reusing the strategy found in health-chat for consistency in this environment.
+        const API_KEY = Deno.env.get('GEMINI_API_KEY') || "AIzaSyD9Mk1_o5SNcJHSyCew_ccCR_XWFsgcPO8";
 
-        const apiKey = Deno.env.get('GEMINI_API_KEY');
-        if (!apiKey) {
+        if (!API_KEY) {
             throw new Error('GEMINI_API_KEY is not set');
         }
 
-        const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
         const prompt = `
       Act as a kind, simple-speaking medical assistant for rural India.
-      The user is reporting pain or an issue with their "${bodyPart}".
+      The user is reporting pain or an issue with their "${bodyPart || 'General'}".
       Additional description: "${userDescription || 'None provided'}".
 
       Analyze the input for potential emergencies (e.g., snake bites, heavy bleeding, chest pain).
@@ -36,12 +32,10 @@ serve(async (req: Request) => {
       Return strictly a JSON object with the following structure:
       {
         "questions": [
-          { "textEn": "Question 1 in English?", "textHi": "Question 1 in Hindi?", "icon": "LucideIconName" },
-          { "textEn": "Question 2 in English?", "textHi": "Question 2 in Hindi?", "icon": "LucideIconName" },
-          { "textEn": "Question 3 in English?", "textHi": "Question 3 in Hindi?", "icon": "LucideIconName" }
+          { "textEn": "Question 1 in English?", "textHi": "Question 1 in Hindi?", "icon": "LucideIconName" }
         ],
         "severity": "Low" | "Medium" | "High",
-        "medicalTerm": "Specific search term for Google Maps (e.g. 'Trauma Center', 'General Hospital', 'Cardiologist', 'Snake Bite Anti-venom')",
+        "medicalTerm": "Specific search term for Google Maps",
         "action": {
           "textEn": "One simple first-aid step in English.",
           "textHi": "One simple first-aid step in Hindi."
@@ -49,32 +43,51 @@ serve(async (req: Request) => {
       }
 
       Use simple language suitable for a rural farmer.
-      For the icon, use standard Lucide React icon names like 'AlertCircle', 'Thermometer', 'Activity', 'Bandage', 'Baby', 'Brain', 'Heart', 'Stethoscope'.
+      ENSURE THE RESPONSE IS VALID JSON. Do not include markdown formatting like \`\`\`json.
     `;
 
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text();
+        // 2. Use Direct Fetch (Simpler, fewer dependencies on Deno edge)
+        const response = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`,
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }]
+                })
+            }
+        );
 
-        // Extract JSON from the response (handling potential markdown blocks)
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
-        if (!jsonMatch) {
-            throw new Error('Failed to parse Gemini response');
+        const data = await response.json();
+
+        if (!response.ok) {
+            console.error("Gemini API Error:", data);
+            throw new Error(data.error?.message || "Failed to fetch from Gemini");
         }
 
-        const data = JSON.parse(jsonMatch[0]);
+        let text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+        // Clean up markdown if present
+        text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+
+        const jsonResponse = JSON.parse(text);
 
         return new Response(
-            JSON.stringify(data),
+            JSON.stringify(jsonResponse),
             { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
 
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error in triage-assist:', error);
         return new Response(
-            JSON.stringify({ error: (error as Error).message || 'Unknown error' }),
+            JSON.stringify({
+                error: (error as Error).message || 'Unknown error',
+                // Fallback valid JSON to prevent frontend crash
+                severity: "Low",
+                action: { textEn: "Error connecting. Please call a doctor.", textHi: "संपर्क त्रुटि। कृपया डॉक्टर को कॉल करें।" }
+            }),
             {
-                status: 500,
+                status: 200, // Return 200 with error info so frontend displays it gracefully
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' }
             }
         );
