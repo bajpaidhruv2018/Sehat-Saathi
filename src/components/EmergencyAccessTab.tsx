@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import EmergencyResponseSheet from './EmergencyResponseSheet';
 
 const EmergencyAccessTab = () => {
@@ -9,6 +9,31 @@ const EmergencyAccessTab = () => {
     const [activeEmergencyId, setActiveEmergencyId] = useState<string | null>(null);
     const [patientName, setPatientName] = useState('');
     const [isNameTouched, setIsNameTouched] = useState(false);
+
+    // Geolocation state
+    const [coords, setCoords] = useState<{ lat: number | null; lng: number | null }>({ lat: null, lng: null });
+    const [locationError, setLocationError] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (!navigator.geolocation) {
+            setLocationError("Geolocation is not supported by your browser.");
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                setCoords({
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                });
+                setLocationError(null);
+            },
+            (error) => {
+                console.error("Error getting location:", error);
+                setLocationError("Location access is required to help hospitals find you.");
+            }
+        );
+    }, []);
 
     const containerStyle: React.CSSProperties = {
         backgroundColor: '#fff',
@@ -76,7 +101,7 @@ const EmergencyAccessTab = () => {
                 name: patientName,
                 message: message,
 
-                location: "23.2599, 77.4126",
+                location: `${coords.lat}, ${coords.lng}`,
                 timestamp: new Date().toISOString()
             };
 
@@ -164,15 +189,21 @@ const EmergencyAccessTab = () => {
                 />
             </div>
 
+            {locationError && (
+                <div style={{ color: '#d32f2f', marginBottom: '10px', fontSize: '14px', fontWeight: 'bold' }}>
+                    ⚠️ {locationError}
+                </div>
+            )}
+
             <button
                 onClick={handleEmergency}
                 style={{
                     ...buttonStyle,
-                    opacity: (isLoading || !patientName) ? 0.6 : 1,
-                    cursor: (isLoading || !patientName) ? 'not-allowed' : 'pointer',
-                    backgroundColor: (isLoading || !patientName) ? '#e57373' : '#d32f2f'
+                    opacity: (isLoading || !patientName || coords.lat === null) ? 0.6 : 1,
+                    cursor: (isLoading || !patientName || coords.lat === null) ? 'not-allowed' : 'pointer',
+                    backgroundColor: (isLoading || !patientName || coords.lat === null) ? '#e57373' : '#d32f2f'
                 }}
-                disabled={isLoading || !patientName}
+                disabled={isLoading || !patientName || coords.lat === null}
             >
                 {isLoading ? 'Sending Alert...' : 'PUSH FOR EMERGENCY'}
             </button>
