@@ -5,8 +5,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { useTranslation } from 'react-i18next';
 
 const EmergencyAccessTab = () => {
+    const { t } = useTranslation();
     const [emergencyType, setEmergencyType] = useState('Snake Bite');
     const [message, setMessage] = useState('');
 
@@ -21,7 +23,7 @@ const EmergencyAccessTab = () => {
 
     useEffect(() => {
         if (!navigator.geolocation) {
-            setLocationError("Geolocation is not supported by your browser.");
+            setLocationError(t('sos.access.geoError'));
             return;
         }
 
@@ -35,10 +37,10 @@ const EmergencyAccessTab = () => {
             },
             (error) => {
                 console.error("Error getting location:", error);
-                setLocationError("Location access is required to help hospitals find you.");
+                setLocationError(t('sos.access.locationError'));
             }
         );
-    }, []);
+    }, [t]);
 
     const handleEmergency = async () => {
         setIsLoading(true);
@@ -68,14 +70,14 @@ const EmergencyAccessTab = () => {
                     console.warn("No ID returned from webhook, using mock ID for demo");
                     setActiveEmergencyId("demo-" + Date.now());
                 }
-                alert('Emergency signal sent successfully! Help is on the way.');
+                alert(t('sos.access.success'));
                 setMessage(''); // Clear message on success
             } else {
-                alert('Failed to send emergency signal. Please try again or call emergency services directly.');
+                alert(t('sos.access.fail'));
             }
         } catch (error) {
             console.error('Error sending emergency signal:', error);
-            alert('Network error. Please try again.');
+            alert(t('sos.access.networkError'));
         } finally {
             setIsLoading(false);
         }
@@ -89,13 +91,13 @@ const EmergencyAccessTab = () => {
                 <div className="space-y-6 h-full flex flex-col">
                     <div className="bg-background border-2 border-red-600 rounded-xl p-6 shadow-sm dark:border-red-500 overflow-y-auto">
                         <div className="mb-6 flex items-center gap-2 border-b border-red-100 pb-2 text-2xl font-bold text-red-600 dark:border-red-900 dark:text-red-500">
-                            <span>🚨</span> Emergency Access
+                            <span>🚨</span> {t('sos.access.title')}
                         </div>
 
                         <div className="space-y-4">
                             <div className="space-y-2">
                                 <Label htmlFor="patient-name" className="text-sm font-semibold text-foreground">
-                                    Patient Name <span className="text-red-600">*</span>
+                                    {t('sos.access.patientName')} <span className="text-red-600">*</span>
                                 </Label>
                                 <Input
                                     id="patient-name"
@@ -103,39 +105,39 @@ const EmergencyAccessTab = () => {
                                     value={patientName}
                                     onChange={(e) => setPatientName(e.target.value)}
                                     onBlur={() => setIsNameTouched(true)}
-                                    placeholder="Enter name of the person in need"
+                                    placeholder={t('sos.access.patientNamePlaceholder')}
                                     className={`w-full ${isNameTouched && !patientName ? "border-red-500 bg-red-50 dark:bg-red-950/20" : ""}`}
                                 />
                             </div>
 
                             <div className="space-y-2">
                                 <Label htmlFor="emergency-type" className="text-sm font-semibold text-foreground">
-                                    Emergency Type
+                                    {t('sos.access.type')}
                                 </Label>
                                 <Select value={emergencyType} onValueChange={setEmergencyType}>
                                     <SelectTrigger id="emergency-type" className="w-full">
-                                        <SelectValue placeholder="Select Emergency Type" />
+                                        <SelectValue placeholder={t('sos.access.typePlaceholder')} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <SelectItem value="Snake Bite">Snake Bite</SelectItem>
-                                        <SelectItem value="Accident / Trauma">Accident / Trauma</SelectItem>
-                                        <SelectItem value="Cardiac / Chest Pain">Cardiac / Chest Pain</SelectItem>
-                                        <SelectItem value="Pregnancy Emergency">Pregnancy Emergency</SelectItem>
-                                        <SelectItem value="Severe Fever / Infection">Severe Fever / Infection</SelectItem>
-                                        <SelectItem value="Other">Other</SelectItem>
+                                        <SelectItem value="Snake Bite">{t('sos.access.types.snakeBite')}</SelectItem>
+                                        <SelectItem value="Accident / Trauma">{t('sos.access.types.accident')}</SelectItem>
+                                        <SelectItem value="Cardiac / Chest Pain">{t('sos.access.types.cardiac')}</SelectItem>
+                                        <SelectItem value="Pregnancy Emergency">{t('sos.access.types.pregnancy')}</SelectItem>
+                                        <SelectItem value="Severe Fever / Infection">{t('sos.access.types.fever')}</SelectItem>
+                                        <SelectItem value="Other">{t('sos.access.types.other')}</SelectItem>
                                     </SelectContent>
                                 </Select>
                             </div>
 
                             <div className="space-y-2">
                                 <Label htmlFor="emergency-message" className="text-sm font-semibold text-foreground">
-                                    Additional Message (Optional)
+                                    {t('sos.access.message')}
                                 </Label>
                                 <Textarea
                                     id="emergency-message"
                                     value={message}
                                     onChange={(e) => setMessage(e.target.value)}
-                                    placeholder="Describe the situation..."
+                                    placeholder={t('sos.access.messagePlaceholder')}
                                     className="min-h-[80px] resize-y"
                                 />
                             </div>
@@ -151,7 +153,7 @@ const EmergencyAccessTab = () => {
                                 disabled={isLoading || !patientName || coords.lat === null}
                                 className="w-full bg-red-600 py-6 text-lg font-bold uppercase hover:bg-red-700 disabled:opacity-60 dark:text-white mt-4"
                             >
-                                {isLoading ? 'Sending Alert...' : 'PUSH FOR EMERGENCY'}
+                                {isLoading ? t('sos.access.sending') : t('sos.access.pushButton')}
                             </Button>
                         </div>
                     </div>
@@ -166,9 +168,9 @@ const EmergencyAccessTab = () => {
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                                     <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
                                 </span>
-                                Live Updates Active
+                                {t('sos.access.header')}
                             </h3>
-                            <div className="text-xs text-green-700 font-mono dark:text-green-500">ID: {activeEmergencyId}</div>
+                            <div className="text-xs text-green-700 font-mono dark:text-green-500">{t('sos.access.id')} {activeEmergencyId}</div>
                         </div>
                         <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
                             <EmergencyResponseSheet emergencyId={activeEmergencyId} />

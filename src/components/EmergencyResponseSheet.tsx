@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
+import { useTranslation } from "react-i18next";
 
 // Initialize Supabase client with specific credentials for this component
 const supabaseUrl = "https://nqiyyailhxmavrcokrmv.supabase.co";
@@ -23,6 +24,7 @@ interface EmergencyResponseSheetProps {
 }
 
 const EmergencyResponseSheet = ({ emergencyId }: EmergencyResponseSheetProps) => {
+    const { t } = useTranslation();
     const [responses, setResponses] = useState<HospitalResponse[]>([]);
 
     useEffect(() => {
@@ -76,13 +78,13 @@ const EmergencyResponseSheet = ({ emergencyId }: EmergencyResponseSheetProps) =>
     return (
         <div className="mt-8 border rounded-lg overflow-hidden shadow-sm bg-white" style={{ fontFamily: 'sans-serif' }}>
             <div className="bg-gray-50 px-6 py-4 border-b flex justify-between items-center">
-                <h3 className="text-lg font-semibold text-gray-800">Hospital Responses</h3>
+                <h3 className="text-lg font-semibold text-gray-800">{t('sos.access.sheetTitle', 'Hospital Responses')}</h3>
                 <div className="flex items-center gap-2">
                     <span className="relative flex h-3 w-3">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                         <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
                     </span>
-                    <span className="text-xs font-medium text-green-700">Live Tracking Active</span>
+                    <span className="text-xs font-medium text-green-700">{t('sos.access.liveTracking', 'Live Tracking Active')}</span>
                 </div>
             </div>
 
@@ -92,8 +94,8 @@ const EmergencyResponseSheet = ({ emergencyId }: EmergencyResponseSheetProps) =>
                         <div className="w-6 h-6 bg-blue-500 rounded-full animate-ping absolute"></div>
                         <div className="w-6 h-6 bg-blue-500 rounded-full relative"></div>
                     </div>
-                    <p className="text-xl text-gray-700 font-bold animate-pulse">Waiting for hospital response...</p>
-                    <p className="text-base text-gray-500 mt-2">Emergency ID: {emergencyId}</p>
+                    <p className="text-xl text-gray-700 font-bold animate-pulse">{t('sos.access.loading')}</p>
+                    <p className="text-base text-gray-500 mt-2">{t('sos.access.id')} {emergencyId}</p>
                 </div>
             ) : (
                 <div className="divide-y divide-gray-200">
@@ -124,7 +126,7 @@ const EmergencyResponseSheet = ({ emergencyId }: EmergencyResponseSheetProps) =>
                                                 <div className="flex items-center gap-2 mt-2">
                                                     <span className="text-2xl">🚑</span>
                                                     <span className={`text-xl font-bold ${textColor}`}>
-                                                        ETA: {response.eta}
+                                                        {t('sos.access.eta')} {response.eta}
                                                     </span>
                                                 </div>
                                             )}
@@ -133,26 +135,26 @@ const EmergencyResponseSheet = ({ emergencyId }: EmergencyResponseSheetProps) =>
                                         <div className="text-right">
                                             {isAvailable && (
                                                 <span className="inline-block px-4 py-2 bg-green-600 text-white text-lg font-bold rounded-lg shadow-sm border border-green-700 animate-pulse">
-                                                    BED AVAILABLE
+                                                    {t('sos.access.bed')}
                                                 </span>
                                             )}
                                             {isFull && (
                                                 <span className="inline-block px-4 py-2 bg-red-600 text-white text-lg font-bold rounded-lg shadow-sm border border-red-700">
-                                                    FULL
+                                                    {t('sos.access.full')}
                                                 </span>
                                             )}
                                         </div>
                                     </div>
 
                                     <div className={`p-5 rounded-lg border-2 ${isAvailable ? 'bg-green-50 border-green-200' : isFull ? 'bg-red-50 border-red-200' : 'bg-gray-50 border-gray-200'}`}>
-                                        <p className={`text-sm font-bold uppercase mb-2 opacity-75 ${textColor}`}>Medical Advice:</p>
+                                        <p className={`text-sm font-bold uppercase mb-2 opacity-75 ${textColor}`}>{t('sos.access.advice')}</p>
                                         <p className={`text-xl font-medium leading-relaxed ${textColor}`}>
                                             {response.medical_advice}
                                         </p>
                                     </div>
 
                                     <div className={`text-sm font-medium opacity-60 text-right ${textColor}`}>
-                                        Responded: {response.responded_at
+                                        {t('sos.access.responded')} {response.responded_at
                                             ? new Date(response.responded_at).toLocaleTimeString()
                                             : new Date(response.created_at).toLocaleTimeString()}
                                     </div>

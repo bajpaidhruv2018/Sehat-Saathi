@@ -37,7 +37,7 @@ const SOSButton = () => {
           {...handlers}
           onClick={onClick}
           className="fixed bottom-6 right-6 z-50 flex h-16 w-16 items-center justify-center rounded-[14px] bg-gradient-to-br from-[#E53935] to-[#FF7043] text-white font-bold tracking-wide shadow-[0_4px_16px_rgba(229,57,53,0.4)] transition-all duration-200 hover:brightness-110 focus:outline-none focus:ring-[3px] focus:ring-[#E53935] focus:ring-offset-2 animate-pulse-sos"
-          aria-label="Emergency SOS"
+          aria-label={t('sos.button')}
         >
           <div className="flex flex-col items-center">
             <Phone className="h-6 w-6 mb-1" />
@@ -50,10 +50,10 @@ const SOSButton = () => {
           <div>
             <DialogTitle className="text-2xl flex items-center gap-2 text-red-600">
               <AlertCircle className="h-6 w-6" />
-              Emergency Assistance
+              {t('sos.title')}
             </DialogTitle>
             <DialogDescription>
-              Get immediate help.
+              {t('sos.description')}
             </DialogDescription>
           </div>
           <DialogClose asChild>
@@ -79,7 +79,7 @@ const SOSButton = () => {
             className="w-full h-12 text-lg font-bold bg-red-600 hover:bg-red-700 shadow-sm flex items-center justify-center gap-2"
           >
             <Phone className="h-5 w-5" />
-            <span>Call Ambulance (108)</span>
+            <span>{t('sos.access.callButton')}</span>
           </Button>
         </div>
       </DialogContent>
