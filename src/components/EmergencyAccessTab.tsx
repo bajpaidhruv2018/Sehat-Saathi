@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import EmergencyResponseSheet from './EmergencyResponseSheet';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 const EmergencyAccessTab = () => {
     const [emergencyType, setEmergencyType] = useState('Snake Bite');
@@ -35,64 +40,6 @@ const EmergencyAccessTab = () => {
         );
     }, []);
 
-    const containerStyle: React.CSSProperties = {
-        backgroundColor: '#fff',
-        border: '2px solid #d32f2f',
-        borderRadius: '8px',
-        padding: '20px',
-        margin: '20px auto',
-        maxWidth: '600px',
-        boxShadow: '0 4px 12px rgba(211, 47, 47, 0.2)',
-        fontFamily: 'sans-serif',
-        color: '#333',
-    };
-
-    const headerStyle: React.CSSProperties = {
-        color: '#d32f2f',
-        fontSize: '24px',
-        fontWeight: 'bold',
-        marginBottom: '20px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '10px',
-        borderBottom: '1px solid #ffebee',
-        paddingBottom: '10px',
-    };
-
-    const labelStyle: React.CSSProperties = {
-        display: 'block',
-        marginBottom: '8px',
-        fontWeight: '600',
-        fontSize: '14px',
-        color: '#444',
-    };
-
-    const inputStyle: React.CSSProperties = {
-        width: '100%',
-        padding: '12px',
-        marginBottom: '20px',
-        border: '1px solid #ccc',
-        borderRadius: '6px',
-        fontSize: '16px',
-        boxSizing: 'border-box',
-        outline: 'none',
-    };
-
-    const buttonStyle: React.CSSProperties = {
-        width: '100%',
-        padding: '16px',
-        backgroundColor: '#d32f2f',
-        color: 'white',
-        border: 'none',
-        borderRadius: '8px',
-        fontSize: '18px',
-        fontWeight: 'bold',
-        cursor: isLoading ? 'not-allowed' : 'pointer',
-        opacity: isLoading ? 0.7 : 1,
-        transition: 'background-color 0.3s',
-        textTransform: 'uppercase',
-    };
-
     const handleEmergency = async () => {
         setIsLoading(true);
         try {
@@ -100,7 +47,6 @@ const EmergencyAccessTab = () => {
                 type: emergencyType,
                 name: patientName,
                 message: message,
-
                 location: `${coords.lat}, ${coords.lng}`,
                 timestamp: new Date().toISOString()
             };
@@ -119,7 +65,6 @@ const EmergencyAccessTab = () => {
                 if (data.id) {
                     setActiveEmergencyId(data.id);
                 } else {
-                    // Fallback for demo if no ID returned
                     console.warn("No ID returned from webhook, using mock ID for demo");
                     setActiveEmergencyId("demo-" + Date.now());
                 }
@@ -137,78 +82,100 @@ const EmergencyAccessTab = () => {
     };
 
     return (
-        <div style={containerStyle}>
-            <div style={headerStyle}>
-                <span>🚨</span> Emergency Access
-            </div>
+        <div className="w-full h-full">
+            <div className={`grid gap-6 h-full transition-all duration-300 ${activeEmergencyId ? 'grid-cols-1 lg:grid-cols-[400px_1fr] xl:grid-cols-[450px_1fr]' : 'grid-cols-1 max-w-2xl mx-auto'}`}>
 
+                {/* Left Side: Form */}
+                <div className="space-y-6 h-full flex flex-col">
+                    <div className="bg-background border-2 border-red-600 rounded-xl p-6 shadow-sm dark:border-red-500 overflow-y-auto">
+                        <div className="mb-6 flex items-center gap-2 border-b border-red-100 pb-2 text-2xl font-bold text-red-600 dark:border-red-900 dark:text-red-500">
+                            <span>🚨</span> Emergency Access
+                        </div>
 
+                        <div className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="patient-name" className="text-sm font-semibold text-foreground">
+                                    Patient Name <span className="text-red-600">*</span>
+                                </Label>
+                                <Input
+                                    id="patient-name"
+                                    type="text"
+                                    value={patientName}
+                                    onChange={(e) => setPatientName(e.target.value)}
+                                    onBlur={() => setIsNameTouched(true)}
+                                    placeholder="Enter name of the person in need"
+                                    className={`w-full ${isNameTouched && !patientName ? "border-red-500 bg-red-50 dark:bg-red-950/20" : ""}`}
+                                />
+                            </div>
 
-            <div>
-                <label style={labelStyle} htmlFor="patient-name">Patient Name <span style={{ color: '#d32f2f' }}>*</span></label>
-                <input
-                    id="patient-name"
-                    type="text"
-                    value={patientName}
-                    onChange={(e) => setPatientName(e.target.value)}
-                    onBlur={() => setIsNameTouched(true)}
-                    placeholder="Enter name of the person in need"
-                    style={{
-                        ...inputStyle,
-                        borderColor: (isNameTouched && !patientName) ? '#d32f2f' : '#ccc',
-                        backgroundColor: (isNameTouched && !patientName) ? '#fff5f5' : '#fff'
-                    }}
-                />
-            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="emergency-type" className="text-sm font-semibold text-foreground">
+                                    Emergency Type
+                                </Label>
+                                <Select value={emergencyType} onValueChange={setEmergencyType}>
+                                    <SelectTrigger id="emergency-type" className="w-full">
+                                        <SelectValue placeholder="Select Emergency Type" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="Snake Bite">Snake Bite</SelectItem>
+                                        <SelectItem value="Accident / Trauma">Accident / Trauma</SelectItem>
+                                        <SelectItem value="Cardiac / Chest Pain">Cardiac / Chest Pain</SelectItem>
+                                        <SelectItem value="Pregnancy Emergency">Pregnancy Emergency</SelectItem>
+                                        <SelectItem value="Severe Fever / Infection">Severe Fever / Infection</SelectItem>
+                                        <SelectItem value="Other">Other</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
 
-            <div>
-                <label style={labelStyle} htmlFor="emergency-type">Emergency Type</label>
-                <select
-                    id="emergency-type"
-                    value={emergencyType}
-                    onChange={(e) => setEmergencyType(e.target.value)}
-                    style={inputStyle}
-                >
-                    <option value="Snake Bite">Snake Bite</option>
-                    <option value="Accident / Trauma">Accident / Trauma</option>
-                    <option value="Cardiac / Chest Pain">Cardiac / Chest Pain</option>
-                    <option value="Pregnancy Emergency">Pregnancy Emergency</option>
-                    <option value="Severe Fever / Infection">Severe Fever / Infection</option>
-                    <option value="Other">Other</option>
-                </select>
-            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="emergency-message" className="text-sm font-semibold text-foreground">
+                                    Additional Message (Optional)
+                                </Label>
+                                <Textarea
+                                    id="emergency-message"
+                                    value={message}
+                                    onChange={(e) => setMessage(e.target.value)}
+                                    placeholder="Describe the situation..."
+                                    className="min-h-[80px] resize-y"
+                                />
+                            </div>
 
-            <div>
-                <label style={labelStyle} htmlFor="emergency-message">Additional Message (Optional)</label>
-                <textarea
-                    id="emergency-message"
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    placeholder="Describe the situation..."
-                    style={{ ...inputStyle, minHeight: '100px', resize: 'vertical' }}
-                />
-            </div>
+                            {locationError && (
+                                <div className="mb-2 text-sm font-bold text-red-600 dark:text-red-400">
+                                    ⚠️ {locationError}
+                                </div>
+                            )}
 
-            {locationError && (
-                <div style={{ color: '#d32f2f', marginBottom: '10px', fontSize: '14px', fontWeight: 'bold' }}>
-                    ⚠️ {locationError}
+                            <Button
+                                onClick={handleEmergency}
+                                disabled={isLoading || !patientName || coords.lat === null}
+                                className="w-full bg-red-600 py-6 text-lg font-bold uppercase hover:bg-red-700 disabled:opacity-60 dark:text-white mt-4"
+                            >
+                                {isLoading ? 'Sending Alert...' : 'PUSH FOR EMERGENCY'}
+                            </Button>
+                        </div>
+                    </div>
                 </div>
-            )}
 
-            <button
-                onClick={handleEmergency}
-                style={{
-                    ...buttonStyle,
-                    opacity: (isLoading || !patientName || coords.lat === null) ? 0.6 : 1,
-                    cursor: (isLoading || !patientName || coords.lat === null) ? 'not-allowed' : 'pointer',
-                    backgroundColor: (isLoading || !patientName || coords.lat === null) ? '#e57373' : '#d32f2f'
-                }}
-                disabled={isLoading || !patientName || coords.lat === null}
-            >
-                {isLoading ? 'Sending Alert...' : 'PUSH FOR EMERGENCY'}
-            </button>
-
-            {activeEmergencyId && <EmergencyResponseSheet emergencyId={activeEmergencyId} />}
+                {/* Right Side: Response Sheet */}
+                {activeEmergencyId && (
+                    <div className="h-full flex flex-col overflow-hidden animate-fade-in pl-1">
+                        <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-4 flex-shrink-0 flex items-center justify-between shadow-sm dark:bg-green-950/20 dark:border-green-900">
+                            <h3 className="text-lg font-bold text-green-800 dark:text-green-400 flex items-center gap-2">
+                                <span className="relative flex h-3 w-3">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                    <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                                </span>
+                                Live Updates Active
+                            </h3>
+                            <div className="text-xs text-green-700 font-mono dark:text-green-500">ID: {activeEmergencyId}</div>
+                        </div>
+                        <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
+                            <EmergencyResponseSheet emergencyId={activeEmergencyId} />
+                        </div>
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

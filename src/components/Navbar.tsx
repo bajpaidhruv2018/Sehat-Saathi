@@ -102,7 +102,6 @@ const Navbar = () => {
     { name: t('nav.healthcare'), path: "/healthcare" },
     { name: t('nav.literacy'), path: "/literacy" },
     { name: t('nav.misconceptions'), path: "/misconceptions", special: true },
-    { name: t('nav.emergency'), path: "/emergency" },
     { name: t('nav.dashboard'), path: "/dashboard" },
     { name: t('nav.askDoctor'), path: "/ask-doctor" },
     { name: t('nav.locator'), path: "/locator" },

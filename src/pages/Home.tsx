@@ -7,7 +7,7 @@ import heroImage from "@/assets/rural-healthcare.jpg";
 import communityImage from "@/assets/healthcare-clinic.jpg";
 import elderImage from "@/assets/mobile-clinic.jpg";
 import { useTranslation } from "react-i18next";
-import EmergencyAccessTab from "@/components/EmergencyAccessTab";
+
 
 const Home = () => {
   const { t } = useTranslation();
@@ -42,13 +42,6 @@ const Home = () => {
               />
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Emergency Access Section */}
-      <section className="py-4 bg-background">
-        <div className="container mx-auto px-4">
-          <EmergencyAccessTab />
         </div>
       </section>
 

@@ -87,64 +87,79 @@ const EmergencyResponseSheet = ({ emergencyId }: EmergencyResponseSheetProps) =>
             </div>
 
             {responses.length === 0 ? (
-                <div className="p-8 text-center bg-blue-50/50">
-                    <div className="inline-block relative">
-                        <div className="w-4 h-4 bg-blue-500 rounded-full animate-ping absolute"></div>
-                        <div className="w-4 h-4 bg-blue-500 rounded-full relative"></div>
+                <div className="p-12 text-center bg-blue-50/50">
+                    <div className="inline-block relative mb-6">
+                        <div className="w-6 h-6 bg-blue-500 rounded-full animate-ping absolute"></div>
+                        <div className="w-6 h-6 bg-blue-500 rounded-full relative"></div>
                     </div>
-                    <p className="mt-4 text-gray-600 font-medium animate-pulse">Waiting for nearby hospitals...</p>
-                    <p className="text-sm text-gray-400 mt-2">Emergency ID: {emergencyId}</p>
+                    <p className="text-xl text-gray-700 font-bold animate-pulse">Waiting for hospital response...</p>
+                    <p className="text-base text-gray-500 mt-2">Emergency ID: {emergencyId}</p>
                 </div>
             ) : (
-                <div className="divide-y">
-                    {responses.map((response) => (
-                        <div key={response.id} className="p-6 hover:bg-gray-50 transition-colors">
-                            <div className="flex justify-between items-start mb-3">
-                                <div>
-                                    <h4 className="font-bold text-xl text-gray-900">{response.hospital_name}</h4>
-                                    {response.eta && (
-                                        <p className="text-sm text-blue-600 font-medium mt-1">
-                                            🚑 ETA: {response.eta}
+                <div className="divide-y divide-gray-200">
+                    {responses.map((response) => {
+                        const isAvailable = response.bed_availability === true;
+                        const isFull = response.bed_availability === false;
+
+                        let cardBg = "bg-white";
+                        let textColor = "text-gray-900";
+
+                        if (isAvailable) {
+                            cardBg = "bg-green-100 border-green-300";
+                            textColor = "text-green-900";
+                        } else if (isFull) {
+                            cardBg = "bg-red-100 border-red-300";
+                            textColor = "text-red-900";
+                        }
+
+                        return (
+                            <div key={response.id} className={`p-6 border-l-8 transition-all ${cardBg} ${isAvailable ? 'border-l-green-600' : isFull ? 'border-l-red-600' : 'border-l-gray-300'}`}>
+                                <div className="flex flex-col gap-4">
+                                    <div className="flex justify-between items-start">
+                                        <div>
+                                            <h4 className={`font-black text-2xl ${textColor} uppercase tracking-tight`}>
+                                                {response.hospital_name}
+                                            </h4>
+                                            {response.eta && (
+                                                <div className="flex items-center gap-2 mt-2">
+                                                    <span className="text-2xl">🚑</span>
+                                                    <span className={`text-xl font-bold ${textColor}`}>
+                                                        ETA: {response.eta}
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className="text-right">
+                                            {isAvailable && (
+                                                <span className="inline-block px-4 py-2 bg-green-600 text-white text-lg font-bold rounded-lg shadow-sm border border-green-700 animate-pulse">
+                                                    BED AVAILABLE
+                                                </span>
+                                            )}
+                                            {isFull && (
+                                                <span className="inline-block px-4 py-2 bg-red-600 text-white text-lg font-bold rounded-lg shadow-sm border border-red-700">
+                                                    FULL
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className={`p-5 rounded-lg border-2 ${isAvailable ? 'bg-green-50 border-green-200' : isFull ? 'bg-red-50 border-red-200' : 'bg-gray-50 border-gray-200'}`}>
+                                        <p className={`text-sm font-bold uppercase mb-2 opacity-75 ${textColor}`}>Medical Advice:</p>
+                                        <p className={`text-xl font-medium leading-relaxed ${textColor}`}>
+                                            {response.medical_advice}
                                         </p>
-                                    )}
+                                    </div>
+
+                                    <div className={`text-sm font-medium opacity-60 text-right ${textColor}`}>
+                                        Responded: {response.responded_at
+                                            ? new Date(response.responded_at).toLocaleTimeString()
+                                            : new Date(response.created_at).toLocaleTimeString()}
+                                    </div>
                                 </div>
-
-                                {response.bed_availability === true ? (
-                                    <span className="px-3 py-1 bg-green-100 text-green-800 text-sm font-bold rounded-full border border-green-200">
-                                        Available
-                                    </span>
-                                ) : response.bed_availability === false ? (
-                                    <span className="px-3 py-1 bg-red-100 text-red-800 text-sm font-bold rounded-full border border-red-200">
-                                        Full
-                                    </span>
-                                ) : (
-                                    // Fallback to strict string status matching if bed_availability is missing
-                                    response.status === "BED AVAILABLE" ? (
-                                        <span className="px-3 py-1 bg-green-100 text-green-800 text-sm font-bold rounded-full border border-green-200">
-                                            BED AVAILABLE
-                                        </span>
-                                    ) : (
-                                        <span className="px-3 py-1 bg-red-100 text-red-800 text-sm font-bold rounded-full border border-red-200">
-                                            HOSPITAL FULL
-                                        </span>
-                                    )
-                                )}
                             </div>
-
-                            <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-md">
-                                <p className="text-sm font-bold text-blue-700 mb-1">Medical Advice:</p>
-                                <p className="text-gray-700">{response.medical_advice}</p>
-                            </div>
-
-                            <div className="mt-3 flex justify-between items-center text-xs text-gray-500">
-                                <span>
-                                    Responded: {response.responded_at
-                                        ? new Date(response.responded_at).toLocaleTimeString()
-                                        : new Date(response.created_at).toLocaleTimeString()}
-                                </span>
-                            </div>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             )}
         </div>
