@@ -53,7 +53,7 @@ const EmergencyAccessTab = () => {
                 timestamp: new Date().toISOString()
             };
 
-            const response = await fetch('http://localhost:5678/webhook/emergency-trigger', {
+            const response = await fetch('https://n8n-qi63.onrender.com/webhook/emergency-trigger', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
