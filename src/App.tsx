@@ -23,6 +23,7 @@ import AskDoctor from "./pages/AskDoctor";
 import HealthLocator from "./pages/HealthLocator";
 import NotFound from "./pages/NotFound";
 import HealthTipsBanner from "./components/HealthTipsBanner";
+import HospitalFinder from "./pages/HospitalFinder";
 
 const queryClient = new QueryClient();
 
@@ -56,13 +57,14 @@ const App = () => {
                     <Routes>
                       <Route path="/" element={<Home />} />
                       <Route path="/education" element={<Education />} />
-                      <Route path="/healthcare" element={<Healthcare />} />
+                      {/* <Route path="/healthcare" element={<Healthcare />} /> */}
                       <Route path="/literacy" element={<Literacy />} />
                       <Route path="/emergency" element={<Emergency />} />
                       <Route path="/misconceptions" element={<Misconceptions />} />
                       <Route path="/dashboard" element={<Dashboard />} />
                       <Route path="/ask-doctor" element={<AskDoctor />} />
                       <Route path="/locator" element={<HealthLocator />} />
+                      <Route path="/hospital-finder" element={<HospitalFinder />} />
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                       <Route path="*" element={<NotFound />} />
                     </Routes>

@@ -17,6 +17,11 @@ interface HospitalResponse {
     responded_at: string;
     eta: string;
     emergency_id: string;
+    doctor_access?: {
+        contact: string;
+        loc_lat: number;
+        loc_long: number;
+    };
 }
 
 interface EmergencyResponseSheetProps {
@@ -40,7 +45,7 @@ const EmergencyResponseSheet = ({ emergencyId }: EmergencyResponseSheetProps) =>
             console.log("Fetching responses for emergency ID:", emergencyId);
             const { data, error } = await supabase
                 .from("Hospital_Responses")
-                .select("*")
+                .select("*, doctor_access:doctor_access!responded_by_id (contact, loc_lat, loc_long)")
                 .eq("emergency_id", emergencyId)
                 .order("responded_at", { ascending: false });
 
@@ -105,7 +110,7 @@ const EmergencyResponseSheet = ({ emergencyId }: EmergencyResponseSheetProps) =>
             const pollResponses = async () => {
                 const { data, error } = await supabase
                     .from("Hospital_Responses")
-                    .select("*")
+                    .select("*, doctor_access:doctor_access!responded_by_id (contact, loc_lat, loc_long)")
                     .eq("emergency_id", emergencyId)
                     .order("responded_at", { ascending: false });
 
@@ -201,6 +206,28 @@ const EmergencyResponseSheet = ({ emergencyId }: EmergencyResponseSheetProps) =>
                                         <p className={`text-xl font-medium leading-relaxed ${textColor}`}>
                                             {response.medical_advice}
                                         </p>
+                                    </div>
+
+                                    {/* Action Buttons */}
+                                    <div className="flex gap-3">
+                                        {response.doctor_access?.contact && (
+                                            <a
+                                                href={`tel:${response.doctor_access.contact}`}
+                                                className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg text-center transition-colors shadow-sm flex items-center justify-center gap-2"
+                                            >
+                                                <span>📞</span> Call Hospital
+                                            </a>
+                                        )}
+                                        {response.doctor_access?.loc_lat && response.doctor_access?.loc_long && (
+                                            <a
+                                                href={`https://www.google.com/maps/search/?api=1&query=${response.doctor_access.loc_lat},${response.doctor_access.loc_long}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg text-center transition-colors shadow-sm flex items-center justify-center gap-2"
+                                            >
+                                                <span>🗺️</span> Navigate
+                                            </a>
+                                        )}
                                     </div>
 
                                     <div className={`text-sm font-medium opacity-60 text-right ${textColor}`}>

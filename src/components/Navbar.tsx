@@ -99,12 +99,13 @@ const Navbar = () => {
   const navItems = [
     { name: t('nav.home'), path: "/" },
     { name: t('nav.education'), path: "/education" },
-    { name: t('nav.healthcare'), path: "/healthcare" },
+    // { name: t('nav.healthcare'), path: "/healthcare" },
     { name: t('nav.literacy'), path: "/literacy" },
     { name: t('nav.misconceptions'), path: "/misconceptions", special: true },
     { name: t('nav.dashboard'), path: "/dashboard" },
     { name: t('nav.askDoctor'), path: "/ask-doctor" },
-    { name: t('nav.locator'), path: "/locator" },
+    { name: "Live Map", path: "/hospital-finder" },
+    // { name: t('nav.locator'), path: "/locator" }, // Hidden as requested
   ];
 
   return (
