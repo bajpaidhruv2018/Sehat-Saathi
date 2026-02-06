@@ -9,7 +9,11 @@ declare global {
     }
 }
 
-const HospitalMap = () => {
+interface HospitalMapProps {
+    onHospitalsUpdate?: (hospitals: any[]) => void;
+}
+
+const HospitalMap = ({ onHospitalsUpdate }: HospitalMapProps) => {
     const mapContainerRef = useRef<HTMLDivElement>(null);
     const mapInstanceRef = useRef<any>(null);
     const markersLayerRef = useRef<any>(null); // This will now hold the MarkerClusterGroup
@@ -130,6 +134,13 @@ const HospitalMap = () => {
             renderMarkers();
         }
     }, [hospitals, activeHospital]);
+
+    // 5. Notify parent component of hospital data changes
+    useEffect(() => {
+        if (onHospitalsUpdate) {
+            onHospitalsUpdate(hospitals);
+        }
+    }, [hospitals, onHospitalsUpdate]);
 
     const initializeMap = () => {
         const L = window.L;

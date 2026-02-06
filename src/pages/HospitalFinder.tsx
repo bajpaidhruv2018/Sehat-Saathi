@@ -1,11 +1,13 @@
 import HospitalMap from "@/components/HospitalMap";
 import { useTranslation } from "react-i18next";
-import { Phone, AlertTriangle, Info } from "lucide-react";
+import { Phone, AlertTriangle, Info, Building2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 const HospitalFinder = () => {
     const { t } = useTranslation();
+    const [hospitals, setHospitals] = useState<any[]>([]);
 
     return (
         <div className="min-h-screen bg-background">
@@ -25,7 +27,7 @@ const HospitalFinder = () => {
 
                 {/* Main Map Section */}
                 <div className="lg:col-span-2 space-y-6">
-                    <HospitalMap />
+                    <HospitalMap onHospitalsUpdate={setHospitals} />
 
                     <Card className="bg-blue-50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800">
                         <CardContent className="p-4 flex items-start gap-3">
@@ -68,23 +70,49 @@ const HospitalFinder = () => {
                         </CardContent>
                     </Card>
 
-                    {/* First Aid Tips */}
+                    {/* Hospitals List */}
                     <Card>
                         <CardHeader>
-                            <CardTitle className="text-base">First Aid Tips</CardTitle>
+                            <CardTitle className="text-base flex items-center gap-2">
+                                <Building2 className="h-5 w-5 text-blue-600" />
+                                Hospitals
+                            </CardTitle>
                         </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="text-sm">
-                                <h4 className="font-semibold text-foreground">Bleeding</h4>
-                                <p className="text-muted-foreground">Apply firm pressure with a clean cloth.</p>
-                            </div>
-                            <div className="text-sm">
-                                <h4 className="font-semibold text-foreground">Burns</h4>
-                                <p className="text-muted-foreground">Cool with running water for 10-20 mins. Do not use ice.</p>
-                            </div>
-                            <Button variant="outline" className="w-full text-xs" onClick={() => window.location.href = '/emergency'}>
-                                View Full First Aid Guide
-                            </Button>
+                        <CardContent>
+                            {hospitals.length > 0 ? (
+                                <>
+                                    <p className="text-sm text-muted-foreground mb-3">
+                                        Found {hospitals.length} hospital{hospitals.length !== 1 ? 's' : ''} in selected range
+                                    </p>
+                                    <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2">
+                                        {hospitals.map((hospital, index) => {
+                                            const name = hospital.tags?.name || "Healthcare Facility";
+                                            const hLat = hospital.lat || hospital.center?.lat;
+                                            const hLon = hospital.lon || hospital.center?.lon;
+
+                                            return (
+                                                <div
+                                                    key={index}
+                                                    className="p-3 bg-secondary/30 rounded-lg border border-border hover:bg-secondary/50 transition-colors"
+                                                >
+                                                    <h4 className="font-semibold text-sm text-foreground mb-1">
+                                                        {name}
+                                                    </h4>
+                                                    {(hLat && hLon) && (
+                                                        <p className="text-xs text-muted-foreground">
+                                                            {hLat.toFixed(4)}, {hLon.toFixed(4)}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </>
+                            ) : (
+                                <p className="text-sm text-muted-foreground">
+                                    No hospitals found in the selected range. Try increasing the search radius.
+                                </p>
+                            )}
                         </CardContent>
                     </Card>
 
