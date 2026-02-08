@@ -27,6 +27,9 @@ interface Question {
   answer_text: string;
   answered_at: string;
   location?: string;
+  doctor_access?: {
+    full_name: string;
+  } | null;
 }
 
 const AskDoctor = () => {
@@ -50,10 +53,10 @@ const AskDoctor = () => {
 
         const { data, error } = await (doctorClient as any)
           .from('health_forum')
-          .select('*')
+          .select('*, doctor_access(full_name)')
           .eq('is_answered', true)
           .order('answered_at', { ascending: false })
-          .limit(10);
+          .limit(5);
 
         if (error) throw error;
         setQuestions((data as Question[]) || []);
@@ -255,7 +258,10 @@ const AskDoctor = () => {
                       <div className="bg-green-50 dark:bg-green-950/30 p-4 rounded-lg border border-green-100 dark:border-green-900">
                         <div className="flex items-center gap-2 mb-2 text-green-700 dark:text-green-400">
                           <CheckCircle className="h-4 w-4" />
-                          <span className="text-sm font-semibold">Verified Doctor Response</span>
+                          <span className="text-sm font-semibold">
+                            Verified Doctor Response
+                            {q.doctor_access?.full_name && ` by Dr. ${q.doctor_access.full_name}`}
+                          </span>
                         </div>
                         <p className="text-foreground/90">{q.answer_text}</p>
                       </div>
