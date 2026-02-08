@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -12,21 +12,13 @@ import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 
-// Initialize specific client for Ask Doctor feature
-// This uses the NEW project url while the rest of the app uses the OLD one
-const DOCTOR_PROJECT_URL = "https://nqiyyailhxmavrcokrmv.supabase.co";
-const DOCTOR_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5xaXl5YWlsaHhtYXZyY29rcm12Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5NTMzNzQsImV4cCI6MjA4NTUyOTM3NH0.py8zZIE91mqXq3SDw6BIDJEFw5qCLuCMAISTZrnzt7M";
-
-const doctorClient = createClient(DOCTOR_PROJECT_URL, DOCTOR_ANON_KEY);
-
 interface Question {
   id: string;
-  patient_name: string;
+  name: string;
   category: string;
-  question_text: string;
-  answer_text: string;
-  answered_at: string;
-  location?: string;
+  question: string;
+  response: string | null;
+  responded_at: string | null;
 }
 
 const AskDoctor = () => {
@@ -48,11 +40,11 @@ const AskDoctor = () => {
       try {
         setLoadingQuestions(true);
 
-        const { data, error } = await (doctorClient as any)
-          .from('health_forum')
+        const { data, error } = await supabase
+          .from('doctor_questions')
           .select('*')
-          .eq('is_answered', true)
-          .order('answered_at', { ascending: false })
+          .not('response', 'is', null)
+          .order('responded_at', { ascending: false })
           .limit(10);
 
         if (error) throw error;
@@ -98,11 +90,10 @@ const AskDoctor = () => {
         console.log("Geolocation not available or permission denied");
       }
 
-      const { error } = await (doctorClient as any).from('health_forum').insert({
-        patient_name: name,
+      const { error } = await supabase.from('doctor_questions').insert({
+        name,
         category,
-        question_text: question,
-        location: location === "Unknown" ? null : location
+        question: question + (location === "Unknown" ? "" : ` [Location: ${location}]`),
       });
 
       if (error) throw error;
@@ -199,6 +190,7 @@ const AskDoctor = () => {
                     <Stethoscope className="mr-2 h-4 w-4" />
                     {t('askDoctor.form.submit')}
                   </>
+
                 )}
               </Button>
             </form>
@@ -237,27 +229,27 @@ const AskDoctor = () => {
                           {q.category}
                         </Badge>
                         <CardTitle className="text-base font-medium">
-                          Asked by {q.patient_name}
+                          Asked by {q.name}
                         </CardTitle>
                       </div>
                       <span className="text-xs text-muted-foreground">
-                        {q.answered_at ? new Date(q.answered_at).toLocaleDateString() : ''}
+                        {q.responded_at ? new Date(q.responded_at).toLocaleDateString() : ''}
                       </span>
                     </div>
                   </CardHeader>
                   <CardContent className="pt-4 space-y-4">
                     <div>
                       <h4 className="font-medium mb-2 text-sm text-muted-foreground">Question:</h4>
-                      <p className="text-foreground">{q.question_text}</p>
+                      <p className="text-foreground">{q.question}</p>
                     </div>
 
-                    {q.answer_text && (
+                    {q.response && (
                       <div className="bg-green-50 dark:bg-green-950/30 p-4 rounded-lg border border-green-100 dark:border-green-900">
                         <div className="flex items-center gap-2 mb-2 text-green-700 dark:text-green-400">
                           <CheckCircle className="h-4 w-4" />
                           <span className="text-sm font-semibold">Verified Doctor Response</span>
                         </div>
-                        <p className="text-foreground/90">{q.answer_text}</p>
+                        <p className="text-foreground/90">{q.response}</p>
                       </div>
                     )}
                   </CardContent>
@@ -270,4 +262,6 @@ const AskDoctor = () => {
     </div>
   );
 };
+
+
 export default AskDoctor;
