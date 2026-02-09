@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import valleyBg from "@/assets/hero-bg.jpg"; // Temporary fallback (aliased) until valley-bg.jpg is saved
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Heart} from "lucide-react";
 
 // Social proof items relevant to Sehat Saathi
 const socialProofItems = [
@@ -186,8 +186,8 @@ const ValleyHero = () => {
             style={{ left: "42.5%", top: "365px", transform: "translateX(-50%)" }}
           >
             <div className="w-36 h-36 md:w-40 md:h-40 rounded-2xl bg-background/95 backdrop-blur-md border border-border shadow-2xl flex items-center justify-center flex-col gap-2">
-              <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-2xl">
-                S
+              <div className="mx-auto bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center">
+                <Heart className="h-8 w-8 text-primary fill-primary" />
               </div>
               <span className="font-bold text-foreground">Sehat Saathi</span>
             </div>

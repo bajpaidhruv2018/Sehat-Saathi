@@ -7,13 +7,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Stethoscope, Loader2, CheckCircle, MessageCircle } from "lucide-react";
+import { Stethoscope, Loader2, CheckCircle, MessageCircle, LogIn, User } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/contexts/AuthContext"; // 1. Import Auth
+import { useNavigate } from "react-router-dom";
 
 // Initialize specific client for Ask Doctor feature
-// This uses the NEW project url while the rest of the app uses the OLD one
 const DOCTOR_PROJECT_URL = "https://nqiyyailhxmavrcokrmv.supabase.co";
 const DOCTOR_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5xaXl5YWlsaHhtYXZyY29rcm12Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5NTMzNzQsImV4cCI6MjA4NTUyOTM3NH0.py8zZIE91mqXq3SDw6BIDJEFw5qCLuCMAISTZrnzt7M";
 
@@ -33,7 +34,12 @@ interface Question {
 }
 
 const AskDoctor = () => {
-  const [name, setName] = useState("");
+  const { user } = useAuth(); // 2. Get logged-in user
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const { t } = useTranslation();
+
+  // Removed 'name' state, we will use user.name
   const [question, setQuestion] = useState("");
   const [category, setCategory] = useState("");
   const [loading, setLoading] = useState(false);
@@ -43,14 +49,10 @@ const AskDoctor = () => {
   const [loadingQuestions, setLoadingQuestions] = useState(true);
   const [questionError, setQuestionError] = useState("");
 
-  const { toast } = useToast();
-  const { t } = useTranslation();
-
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
         setLoadingQuestions(true);
-
         const { data, error } = await (doctorClient as any)
           .from('health_forum')
           .select('*, doctor_access(full_name)')
@@ -67,14 +69,24 @@ const AskDoctor = () => {
         setLoadingQuestions(false);
       }
     };
-
     fetchQuestions();
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!name || !question || !category) {
+    // 3. Security Check: Block submission if not logged in
+    if (!user) {
+        toast({
+            title: "Login Required",
+            description: "You must be logged in to submit a question.",
+            variant: "destructive",
+        });
+        navigate("/login");
+        return;
+    }
+
+    if (!question || !category) {
       toast({
         title: t('askDoctor.messages.missing'),
         description: t('askDoctor.messages.fillAll'),
@@ -87,22 +99,19 @@ const AskDoctor = () => {
 
     try {
       let location = "Unknown";
-
       try {
         if (navigator.geolocation) {
           const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-            navigator.geolocation.getCurrentPosition(resolve, reject, {
-              timeout: 5000
-            });
+            navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000 });
           });
           location = `${position.coords.latitude},${position.coords.longitude}`;
         }
       } catch (error) {
-        console.log("Geolocation not available or permission denied");
+        console.log("Geolocation not available");
       }
 
       const { error } = await (doctorClient as any).from('health_forum').insert({
-        patient_name: name,
+        patient_name: user.name, // 4. Auto-fill name from Auth Context
         category,
         question_text: question,
         location: location === "Unknown" ? null : location
@@ -115,8 +124,6 @@ const AskDoctor = () => {
         description: "A doctor will reply soon.",
       });
 
-      // Clear form
-      setName("");
       setQuestion("");
       setCategory("");
     } catch (error) {
@@ -145,66 +152,78 @@ const AskDoctor = () => {
         <Card className="animate-fade-in mb-12">
           <CardHeader>
             <CardTitle>{t('askDoctor.form.title')}</CardTitle>
-            <CardDescription>
-              {t('askDoctor.form.desc')}
-            </CardDescription>
+            <CardDescription>{t('askDoctor.form.desc')}</CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-2">
-                <Label htmlFor="name">{t('askDoctor.form.name')}</Label>
-                <Input
-                  id="name"
-                  placeholder={t('askDoctor.form.namePlaceholder')}
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  disabled={loading}
-                />
-              </div>
+            {/* 5. Conditional Rendering: Show Login Button or Form */}
+            {!user ? (
+                <div className="flex flex-col items-center justify-center py-10 text-center space-y-4">
+                    <div className="bg-muted p-4 rounded-full">
+                        <LogIn className="h-8 w-8 text-muted-foreground" />
+                    </div>
+                    <div>
+                        <h3 className="text-lg font-semibold">Login Required</h3>
+                        <p className="text-muted-foreground max-w-xs mx-auto mt-1">
+                            To ensure quality medical advice, please log in to post your question.
+                        </p>
+                    </div>
+                    <Button onClick={() => navigate("/login")} className="mt-4">
+                        Login / Sign Up
+                    </Button>
+                </div>
+            ) : (
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  
+                  {/* Visual Indicator of who is asking */}
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 p-3 rounded-md border border-muted">
+                    <User className="h-4 w-4" />
+                    <span>Asking as: <span className="font-bold text-foreground">{user.name}</span></span>
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="category">{t('askDoctor.form.category')}</Label>
-                <Select value={category} onValueChange={setCategory} disabled={loading}>
-                  <SelectTrigger id="category">
-                    <SelectValue placeholder={t('askDoctor.form.categoryPlaceholder')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="general">{t('askDoctor.categories.general')}</SelectItem>
-                    <SelectItem value="nutrition">{t('askDoctor.categories.nutrition')}</SelectItem>
-                    <SelectItem value="fitness">{t('askDoctor.categories.fitness')}</SelectItem>
-                    <SelectItem value="mental">{t('askDoctor.categories.mental')}</SelectItem>
-                    <SelectItem value="chronic">{t('askDoctor.categories.chronic')}</SelectItem>
-                    <SelectItem value="preventive">{t('askDoctor.categories.preventive')}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="category">{t('askDoctor.form.category')}</Label>
+                    <Select value={category} onValueChange={setCategory} disabled={loading}>
+                      <SelectTrigger id="category">
+                        <SelectValue placeholder={t('askDoctor.form.categoryPlaceholder')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="general">{t('askDoctor.categories.general')}</SelectItem>
+                        <SelectItem value="nutrition">{t('askDoctor.categories.nutrition')}</SelectItem>
+                        <SelectItem value="fitness">{t('askDoctor.categories.fitness')}</SelectItem>
+                        <SelectItem value="mental">{t('askDoctor.categories.mental')}</SelectItem>
+                        <SelectItem value="chronic">{t('askDoctor.categories.chronic')}</SelectItem>
+                        <SelectItem value="preventive">{t('askDoctor.categories.preventive')}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="question">{t('askDoctor.form.question')}</Label>
-                <Textarea
-                  id="question"
-                  placeholder={t('askDoctor.form.questionPlaceholder')}
-                  value={question}
-                  onChange={(e) => setQuestion(e.target.value)}
-                  rows={6}
-                  disabled={loading}
-                />
-              </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="question">{t('askDoctor.form.question')}</Label>
+                    <Textarea
+                      id="question"
+                      placeholder={t('askDoctor.form.questionPlaceholder')}
+                      value={question}
+                      onChange={(e) => setQuestion(e.target.value)}
+                      rows={6}
+                      disabled={loading}
+                    />
+                  </div>
 
-              <Button type="submit" disabled={loading} className="w-full">
-                {loading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    {t('askDoctor.form.submitting')}
-                  </>
-                ) : (
-                  <>
-                    <Stethoscope className="mr-2 h-4 w-4" />
-                    {t('askDoctor.form.submit')}
-                  </>
-                )}
-              </Button>
-            </form>
+                  <Button type="submit" disabled={loading} className="w-full">
+                    {loading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        {t('askDoctor.form.submitting')}
+                      </>
+                    ) : (
+                      <>
+                        <Stethoscope className="mr-2 h-4 w-4" />
+                        {t('askDoctor.form.submit')}
+                      </>
+                    )}
+                  </Button>
+                </form>
+            )}
           </CardContent>
         </Card>
 

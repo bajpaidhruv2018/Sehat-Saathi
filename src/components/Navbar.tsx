@@ -1,5 +1,5 @@
-import { Link, useLocation } from "react-router-dom";
-import { Heart, Menu } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Heart, Menu, LogIn, LogOut, User } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -7,6 +7,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 import { useLongPressSpeech } from "@/hooks/useLongPressSpeech";
+import { useAuth } from "@/contexts/AuthContext"; // 1. Import Auth
 import React, { useState, useRef } from "react";
 
 const MAGNETIC_DISTANCE = 6;
@@ -17,7 +18,6 @@ const NavButtonWithSpeech = ({ item, isActive, className, children, to, ...props
     textToSpeak: t('tts.buttonDesc', { label: item.name })
   });
 
-  // Magnetic & Spotlight Logic (Ported from Button.tsx)
   const [magneticStyle, setMagneticStyle] = useState({});
   const [spotlightStyle, setSpotlightStyle] = useState({});
   const ref = useRef<HTMLAnchorElement>(null);
@@ -52,8 +52,6 @@ const NavButtonWithSpeech = ({ item, isActive, className, children, to, ...props
   const handleMouseLeave = () => {
     setMagneticStyle({});
     setSpotlightStyle({});
-    // Also clear from useLongPressSpeech if needed? 
-    // hook handles its own leave via handlers.onMouseLeave, so we compose them.
     if (handlers.onMouseLeave) {
       handlers.onMouseLeave(null as any);
     }
@@ -68,7 +66,7 @@ const NavButtonWithSpeech = ({ item, isActive, className, children, to, ...props
           variant: isActive ? "default" : "ghost",
           size: "sm"
         }),
-        "relative overflow-hidden", // Needed for spotlight positioning
+        "relative overflow-hidden",
         className
       )}
       onClick={onClick}
@@ -94,18 +92,18 @@ const NavButtonWithSpeech = ({ item, isActive, className, children, to, ...props
 
 const Navbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const { t } = useTranslation();
+  const { user, logout } = useAuth(); // 2. Use Auth Context
 
   const navItems = [
     { name: t('nav.home'), path: "/" },
     { name: t('nav.education'), path: "/education" },
-    // { name: t('nav.healthcare'), path: "/healthcare" },
     { name: t('nav.literacy'), path: "/literacy" },
     { name: t('nav.misconceptions'), path: "/misconceptions", special: true },
     { name: t('nav.dashboard'), path: "/dashboard" },
     { name: t('nav.askDoctor'), path: "/ask-doctor" },
     { name: "Live Map", path: "/hospital-finder" },
-    // { name: t('nav.locator'), path: "/locator" }, // Hidden as requested
   ];
 
   return (
@@ -137,9 +135,25 @@ const Navbar = () => {
           ))}
         </div>
 
-        <div className="hidden items-center gap-1 ml-2 pl-2 border-l border-border xl:flex shrink-0">
+        <div className="hidden items-center gap-2 ml-2 pl-2 border-l border-border xl:flex shrink-0">
           <LanguageSwitcher />
           <ThemeToggle />
+
+          {/* 3. DESKTOP LOGIN / LOGOUT BUTTON */}
+          {user ? (
+            <div className="flex items-center gap-2 ml-2 animate-in fade-in">
+              <span className="text-xs font-bold text-primary flex items-center gap-1 bg-primary/10 px-2 py-1 rounded-md">
+                <User className="h-3 w-3" /> {user.name.split(" ")[0]}
+              </span>
+              <Button variant="outline" size="sm" onClick={logout} className="h-8 w-8 p-0" title="Logout">
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </div>
+          ) : (
+            <Button size="sm" onClick={() => navigate("/login")} className="ml-2 h-8 gap-2">
+              <LogIn className="h-4 w-4" /> Login
+            </Button>
+          )}
         </div>
 
         {/* MOBILE NAVIGATION */}
@@ -152,6 +166,26 @@ const Navbar = () => {
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px] sm:w-[400px] overflow-y-auto">
               <div className="flex flex-col gap-6 mt-6">
+                
+                {/* 4. MOBILE LOGIN SECTION */}
+                <div className="flex items-center justify-between border-b pb-4">
+                  {user ? (
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                        <User className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <p className="font-bold text-sm">{user.name}</p>
+                        <p className="text-xs text-muted-foreground">Logged In</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <Button className="w-full" onClick={() => navigate("/login")}>
+                      <LogIn className="h-4 w-4 mr-2" /> Login / Signup
+                    </Button>
+                  )}
+                </div>
+
                 <div className="flex items-center justify-between border-b pb-4">
                   <span className="font-semibold">{t('nav.settings', { defaultValue: 'Settings' })}</span>
                   <div className="flex items-center gap-2">
@@ -159,6 +193,7 @@ const Navbar = () => {
                     <ThemeToggle />
                   </div>
                 </div>
+
                 <div className="flex flex-col gap-4">
                   {navItems.map((item) => (
                     <NavButtonWithSpeech
@@ -175,6 +210,13 @@ const Navbar = () => {
                       {item.special && <span className="ml-2">✨</span>}
                     </NavButtonWithSpeech>
                   ))}
+
+                  {/* Mobile Logout Button */}
+                  {user && (
+                    <Button variant="destructive" className="w-full mt-4" onClick={logout}>
+                      <LogOut className="h-4 w-4 mr-2" /> Logout
+                    </Button>
+                  )}
                 </div>
               </div>
             </SheetContent>
