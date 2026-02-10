@@ -3,7 +3,14 @@
 ## 📱 Visible Tabs & Functionality
 Here is an explanation of the visible sections of the application relative to the UI (Navigation & Features):
 
-### 1. Home (`/`)
+### 1. Login (`/login`)
+*   **What it calls**: `src/pages/Login.tsx`
+*   **What it does**: User authentication entry point. Integrated with Supabase Auth.
+*   **Tech Stack**:
+    *   **Auth**: Supabase Auth (`AuthProvider` context).
+    *   **UI**: Shadcn Forms, Validation (likely Zod/React Hook Form based on `package.json`).
+
+### 2. Home (`/`)
 *   **What it calls**: `src/pages/Home.tsx`
 *   **What it does**: The landing page of the application. It features a "Hero" section with a call to action to explore education or healthcare. It highlights key features (Education, Literacy, Voice support) using valid cards. It includes a prominent "Health Myths" flip-card widget that leads to the Misconceptions page. It also showcases impact statistics and the project vision.
 *   **Tech Stack**:
@@ -82,8 +89,13 @@ Here is an explanation of the visible sections of the application relative to th
 
 ### **Frontend Core**
 *   **Framework**: [React](https://react.dev/) (v18.3)
-*   **Build Tool**: [Vite](https://vitejs.dev/) (Fast bundler)
-*   **Language**: [TypeScript](https://www.typescriptlang.org/) (Static typing)
+*   **Build Tool**: [Vite](https://vitejs.dev/) (v7.1.12) - configured on port `8080`.
+*   **Language**: [TypeScript](https://www.typescriptlang.org/) (Static typing, loose config with `noImplicitAny: false`).
+*   **Project Structure**:
+    *   `src/components`: UI components (Shadcn + Custom).
+    *   `src/pages`: Route handlers.
+    *   `src/services`: Business logic (e.g., `SpeechService`).
+    *   `src/contexts`: Global state (`AuthContext`, `LanguageContext`).
 
 ### **UI & Styling**
 *   **Styling**: [Tailwind CSS](https://tailwindcss.com/) (Utility-first CSS)
@@ -106,4 +118,7 @@ Here is an explanation of the visible sections of the application relative to th
 
 ### **Accessibility & Internationalization**
 *   **i18n**: [i18next](https://www.i18next.com/) & `react-i18next` (Translation management).
-*   **Text-to-Speech**: Web Speech API (`speechSynthesis`) integrated via custom hooks.
+*   **Text-to-Speech**: `SpeechService.ts` wraps Web Speech API.
+    *   **Logic**: Maps language codes to BCP 47 tags (e.g., `te` -> `te-IN`).
+    *   **Fallback**: Marathi falls back to Hindi; others stay silent if no voice is available.
+

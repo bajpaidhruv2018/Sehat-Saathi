@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import valleyBg from "@/assets/hero-bg.jpg"; // Temporary fallback (aliased) until valley-bg.jpg is saved
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { ArrowRight, Heart} from "lucide-react";
+import { ArrowRight, Heart } from "lucide-react";
 
 // Social proof items relevant to Sehat Saathi
 const socialProofItems = [

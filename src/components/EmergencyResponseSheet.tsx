@@ -1,11 +1,6 @@
 import { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
 import { useTranslation } from "react-i18next";
-
-// Initialize Supabase client with specific credentials for this component
-const supabaseUrl = "https://nqiyyailhxmavrcokrmv.supabase.co";
-const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5xaXl5YWlsaHhtYXZyY29rcm12Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5NTMzNzQsImV4cCI6MjA4NTUyOTM3NH0.py8zZIE91mqXq3SDw6BIDJEFw5qCLuCMAISTZrnzt7M";
-const supabase = createClient(supabaseUrl, supabaseKey);
+import { supabase } from "@/integrations/supabase/client";
 
 interface HospitalResponse {
     response_id: string; // Changed from id
@@ -43,9 +38,11 @@ const EmergencyResponseSheet = ({ emergencyId }: EmergencyResponseSheetProps) =>
         // Shared fetch function
         const fetchResponses = async () => {
             console.log("Fetching responses for emergency ID:", emergencyId);
+            // @ts-ignore - Table not in types yet
             const { data, error } = await supabase
-                .from("Hospital_Responses")
-                .select("*, doctor_access:doctor_access!responded_by_id (contact, loc_lat, loc_long)")
+                .from("Hospital_Responses") // User confirmed Uppercase
+                // Changed to LEFT JOIN (removed !responded_by_id enforcement) to show responses even if doctor info is missing
+                .select("*, doctor_access(contact, loc_lat, loc_long)")
                 .eq("emergency_id", emergencyId)
                 .order("responded_at", { ascending: false });
 
@@ -53,9 +50,13 @@ const EmergencyResponseSheet = ({ emergencyId }: EmergencyResponseSheetProps) =>
                 console.error("Error fetching responses:", error);
                 setFetchError(JSON.stringify(error));
             } else if (data) {
+                console.log("Fetched responses:", data.length);
                 // Clear error if success
                 setFetchError(null);
-                setResponses(data as unknown as HospitalResponse[]);
+                setResponses(prev => {
+                    const simulated = prev.filter(r => r.response_id.startsWith('sim-'));
+                    return [...simulated, ...(data as unknown as HospitalResponse[])];
+                });
             }
         };
 
@@ -74,11 +75,11 @@ const EmergencyResponseSheet = ({ emergencyId }: EmergencyResponseSheetProps) =>
                 {
                     event: 'INSERT',
                     schema: 'public',
-                    table: 'Hospital_Responses',
+                    table: 'Hospital_Responses', // User confirmed
                     filter: `emergency_id=eq.${emergencyId}`,
                 },
                 (payload) => {
-                    console.log('New response received:', payload);
+                    console.log('New response received (realtime):', payload);
                     const newResponse = payload.new as HospitalResponse;
                     setResponses((prev) => [newResponse, ...prev]);
                 }
@@ -108,14 +109,23 @@ const EmergencyResponseSheet = ({ emergencyId }: EmergencyResponseSheetProps) =>
 
             // Define fetch function again for polling scope
             const pollResponses = async () => {
+                // @ts-ignore - Table not in types yet
                 const { data, error } = await supabase
                     .from("Hospital_Responses")
-                    .select("*, doctor_access:doctor_access!responded_by_id (contact, loc_lat, loc_long)")
+                    // Changed to LEFT JOIN (removed !responded_by_id enforcement)
+                    .select("*, doctor_access(contact, loc_lat, loc_long)")
+                    // .select("*")
                     .eq("emergency_id", emergencyId)
                     .order("responded_at", { ascending: false });
 
                 if (data) {
-                    setResponses(data as unknown as HospitalResponse[]);
+                    setResponses(prev => {
+                        const simulated = prev.filter(r => r.response_id.startsWith('sim-'));
+                        return [...simulated, ...(data as unknown as HospitalResponse[])];
+                    });
+                } else if (error) {
+                    // Retry logic not needed in poll as much, but good for consistency
+                    console.warn("Polling error:", error);
                 }
             };
 
@@ -150,7 +160,11 @@ const EmergencyResponseSheet = ({ emergencyId }: EmergencyResponseSheetProps) =>
                         <div className="w-6 h-6 bg-blue-500 rounded-full relative"></div>
                     </div>
                     <p className="text-xl text-gray-700 font-bold animate-pulse">{t('sos.access.loading')}</p>
-                    <p className="text-base text-gray-500 mt-2">{t('sos.access.id')} {emergencyId}</p>
+                    <p className="text-base text-gray-500 mt-2 font-mono bg-gray-100 p-1 rounded inline-block">
+                        ID: {emergencyId}
+                    </p>
+
+
                 </div>
             ) : (
                 <div className="divide-y divide-gray-200">

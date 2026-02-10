@@ -86,6 +86,7 @@ const EmergencyAccessTab = () => {
                     console.warn("No ID returned from webhook, using mock ID for demo");
                     setActiveEmergencyId("demo-" + Date.now());
                 }
+
                 alert(t('sos.access.success'));
                 setMessage(''); // Clear message on success
 

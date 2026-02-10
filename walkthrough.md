@@ -1,26 +1,46 @@
-# Walkthrough - Workflow URL Update
+# Fixes Applied
 
-I have updated the emergency request workflow URL in the application.
+## 1. Missing Dependency: framer-motion
+- Ran `npm install` to synchronize local dependencies with `package.json`.
 
-## Changes
+## 2. Login Schema Error (Production)
+- **Issue**: Missing Environment Variables in production.
+- **Fix**: Hardcoded `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` in `src/integrations/supabase/client.ts`.
+- **Cleanup**: Removed exposed keys from `.gitignore`.
 
-### [EmergencyAccessTab.tsx](file:///c:/College/hackathons/SehatSaathi/remote-well-reach/src/components/EmergencyAccessTab.tsx)
+## 3. Emergency Response "Stuck" / "Waiting..."
+- **Issue**: Multiple contributing factors:
+    1.  **Wrong Client**: `EmergencyResponseSheet.tsx` used a separate, incorrect Supabase client. -> **Fixed** (Used shared client).
+    2.  **Wrong Table Name**: Code used `hospital_responses` (lowercase), schema is `Hospital_Responses` (uppercase). -> **Fixed**.
+    3.  **Strict Filtering (The Real Culprit)**: The query used an **Inner Join** (`!responded_by_id`) on the `doctor_access` table. This hid valid responses if they lacked doctor details (common for new/automated responses).
+    4.  **Service Worker**: `sw.js` was intercepting and failing requests. -> **Fixed** (Disabled SW).
 
-I updated the fetch URL for the emergency trigger to point to the production Render instance.
+- **Final Fix**:
+    - Updated `EmergencyResponseSheet.tsx` to use **Left Join** (`doctor_access(...)`), ensuring responses appear even without doctor info.
+    - Verified connectivity with "Test Connection" tool (Success).
+    - Verified data flow with "Check Recent DB Entries" (Confirmed backend issue if data missing).
 
-```typescript
-// Before
-const response = await fetch('http://localhost:5678/webhook/emergency-trigger', { ... });
-
-// After
-const response = await fetch('https://n8n-qi63.onrender.com/webhook/emergency-trigger', { ... });
-```
+## 4. Debugging Tools Added & Removed
+- Added "Test Connectivity", "Simulate Response", and "Check Recent DB Entries" buttons to diagnostic UI.
+- Removed all debug UI elements after confirming the issue lies with backend data generation (Hospital side), not frontend connectivity.
 
 ## Verification Results
+- **Connectivity**: Frontend correctly connects to `Hospital_Responses`.
+- **Display**: UI now correctly displays any response present in the DB, regardless of completeness.
+- **Current State**: The application is waiting for the backend/webhook (n8n) to actually insert rows into the database. If the backend fails, the UI correctly stays in "Waiting" mode.
 
-### Automated Tests
-- Ran `npm run build` to ensure the changes didn't break the build process.
+## 5. Chatbot / Edge Function Fix
+- **Issue**: "Edge function error" due to invalid/missing Gemini API key.
+- **Fix**: Updated `GEMINI_API_KEY` fallback in `supabase/functions/health-chat/index.ts` and `triage-assist/index.ts` with the new key provided by the user.
+- **Verification**: User to deploy functions (`supabase functions deploy health-chat`, `supabase functions deploy triage-assist`) and test chatbot.
 
-### Manual Verification
-- The code change is straightforward and replaces a hardcoded string.
-- I confirmed there were no other occurrences of `hospital-response` webhook usage in the codebase.
+> [!IMPORTANT]
+> **If you see "Failed to send a request" or "404 Not Found":**
+> It means the functions are **not deployed** to the Supabase project.
+> Run the following commands in your terminal:
+> ```bash
+> npx supabase functions deploy health-chat --project-ref nqiyyailhxmavrcokrmv
+> npx supabase functions deploy triage-assist --project-ref nqiyyailhxmavrcokrmv
+> ```
+> *If `npx supabase` asks for a login, you may need to run `npx supabase login` first.*
+> *Alternatively, copy the code from `supabase/functions/health-chat/index.ts` and paste it into the Supabase Dashboard > Edge Functions > health-chat.*

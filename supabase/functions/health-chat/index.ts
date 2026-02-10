@@ -21,7 +21,7 @@ serve(async (req: Request) => {
     // IMPORTANT: In production, use Deno.env.get('GEMINI_API_KEY')
     // For now, using the provided key to fix the immediate issue.
     // GUIDANCE: Move this to Supabase Secrets before pushing to public repo!
-    const API_KEY = Deno.env.get('GEMINI_API_KEY') || "AIzaSyD9Mk1_o5SNcJHSyCew_ccCR_XWFsgcPO8";
+    const API_KEY = Deno.env.get('GEMINI_API_KEY') || "AIzaSyAW5nirXbPJfzvGs6gPc-PXTqSRU47GgSI";
 
     if (!API_KEY) {
       throw new Error('GEMINI_API_KEY is not set');
@@ -53,10 +53,10 @@ serve(async (req: Request) => {
     );
 
     const data = await response.json();
-    
+
     if (!response.ok) {
-        console.error("Gemini API Error:", data);
-        throw new Error(data.error?.message || "Failed to fetch from Gemini");
+      console.error("Gemini API Error:", data);
+      throw new Error(data.error?.message || "Failed to fetch from Gemini");
     }
 
     const aiReply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I could not understand that.";
@@ -69,7 +69,7 @@ serve(async (req: Request) => {
   } catch (error: any) {
     console.error('Error in health-chat function:', error);
     return new Response(
-      JSON.stringify({ 
+      JSON.stringify({
         error: error.message || 'An error occurred',
         reply: 'Status: FALSE\nEnglish: I encountered an error connecting to the expert system.\nHindi: मुझे विशेषज्ञ प्रणाली से जुड़ने में त्रुटि का सामना करना पड़ा।'
       }), {

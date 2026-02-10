@@ -8,7 +8,7 @@ import { registerServiceWorker } from "./utils/pwa";
 
 console.log("🚀 SehatSaathi main.tsx is loading...");
 
-registerServiceWorker();
+// registerServiceWorker(); // Disabled to prevent SW fetch errors during debugging
 
 const rootElement = document.getElementById("root");
 console.log("📍 Root element:", rootElement);

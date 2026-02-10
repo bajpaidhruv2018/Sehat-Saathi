@@ -2,7 +2,13 @@ import { useState, useRef, useEffect } from "react";
 import { Send, Paperclip, Mic, Phone, CheckCircle2, AlertTriangle, X, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { createClient } from "@supabase/supabase-js";
 import { cn } from "@/lib/utils";
+
+// Hardcoded client for Chatbot only (as per specific user request)
+const CHAT_SUPABASE_URL = "https://ymcejzgkvlxepjaihqzs.supabase.co";
+const CHAT_SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltY2Vqemdrdmx4ZXBqYWlocXpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE5OTEwNDUsImV4cCI6MjA3NzU2NzA0NX0.hn6zvDSSvg0Nn5vCyzia-bEOwChxrY88V53dCm5Jek4";
+const chatSupabase = createClient(CHAT_SUPABASE_URL, CHAT_SUPABASE_KEY);
 
 interface Message {
     id: string;
@@ -69,7 +75,7 @@ export const ChatInterface = ({ onClose }: ChatInterfaceProps) => {
         setIsTyping(true);
 
         try {
-            const { data, error } = await supabase.functions.invoke('health-chat', {
+            const { data, error } = await chatSupabase.functions.invoke('health-chat', {
                 body: { message: userMsg.textEn }
             });
 

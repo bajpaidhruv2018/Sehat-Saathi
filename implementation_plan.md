@@ -1,22 +1,22 @@
-# Update Workflow URLs
+# Configure Chatbot to use a separate Supabase project
 
-## Goal
-Update the production URLs for the emergency request workflow and the hospital response workflow (if used).
+The user wants the chatbot to use a dedicated Supabase project (URL: `https://ymcejzgkvlxepjaihqzs.supabase.co`) while the rest of the app continues to use the main project.
 
 ## User Review Required
-> [!IMPORTANT]
-> I found the emergency request URL usages in `src/components/EmergencyAccessTab.tsx` and will update it.
-> I did **not** find any direct usage of a "hospital response" webhook URL. The system uses Supabase Realtime for hospital responses.
-> I will proceed with updating the emergency request URL only, unless instructed otherwise.
+
+- **Hardcoded Credentials**: I will strictly hardcode the provided URL and Anon Key into `ChatInterface.tsx` as requested. This is generally not recommended for production but fulfills the specific request "do not alter .env".
 
 ## Proposed Changes
 
-### Frontend Components
+### Components
 
-#### [MODIFY] [EmergencyAccessTab.tsx](file:///c:/College/hackathons/SehatSaathi/remote-well-reach/src/components/EmergencyAccessTab.tsx)
-- Update code to use `https://n8n-qi63.onrender.com/webhook/emergency-trigger` instead of `http://localhost:5678/webhook/emergency-trigger`.
+#### [MODIFY] [src/components/ChatInterface.tsx](file:///c:/College/hackathons/SehatSaathi/remote-well-reach/src/components/ChatInterface.tsx)
+- Import `createClient` from `@supabase/supabase-js`.
+- Create a specific `chatSupabase` client instance using the provided credentials.
+- Update `handleSend` to use `chatSupabase.functions.invoke` instead of the global `supabase` client.
 
 ## Verification Plan
 
-### Automated Tests
-- Run `npm run build` to ensure no build errors.
+### Manual Verification
+- I will verify the code changes ensure only `ChatInterface` uses the new client.
+- The user will need to test the chatbot. The previous 404 error should be resolved if the edge function is deployed on *this* new project.

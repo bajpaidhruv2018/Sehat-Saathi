@@ -16,7 +16,7 @@ serve(async (req: Request) => {
         // 1. Get Key (Try Env first, fallback to the one seen in health-chat logs/code if needed or error)
         // NOTE: In production, strictly use Deno.env.get('GEMINI_API_KEY').
         // Reusing the strategy found in health-chat for consistency in this environment.
-        const API_KEY = Deno.env.get('GEMINI_API_KEY') || "AIzaSyD9Mk1_o5SNcJHSyCew_ccCR_XWFsgcPO8";
+        const API_KEY = Deno.env.get('GEMINI_API_KEY') || "AIzaSyAW5nirXbPJfzvGs6gPc-PXTqSRU47GgSI";
 
         if (!API_KEY) {
             throw new Error('GEMINI_API_KEY is not set');
