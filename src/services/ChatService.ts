@@ -5,10 +5,16 @@ export interface ChatReply {
     rawText: string;
 }
 
-const GROQ_API_KEY =
-    import.meta.env.VITE_GROQ_API_KEY ||
-    import.meta.env.GROQ_API_KEY ||
-    "";
+function getGroqKey(): string {
+    let raw = (import.meta.env.VITE_GROQ_API_KEY || import.meta.env.GROQ_API_KEY || "").trim();
+    // Remove surrounding quotes if pasted with quotes
+    raw = raw.replace(/^["']|["']$/g, '').trim();
+    // Auto-strip accidental leading 'A' (e.g. Agsk_...)
+    if (raw.startsWith('Agsk_')) {
+        raw = raw.substring(1);
+    }
+    return raw;
+}
 
 export function parseHealthChatResponse(text: string): {
     status?: 'TRUE' | 'FALSE' | 'ADVICE';
@@ -35,6 +41,13 @@ export function parseHealthChatResponse(text: string): {
 }
 
 export async function askHealthChatbot(message: string): Promise<ChatReply> {
+    const apiKey = getGroqKey();
+    if (!apiKey) {
+        throw new Error(
+            "Missing Groq API Key on production. Please add 'VITE_GROQ_API_KEY' in your Vercel Project Settings > Environment Variables, then click 'Redeploy' to rebuild with the new key."
+        );
+    }
+
     const systemPrompt = `You are Sehat Saathi, a caring and knowledgeable medical and health advisor for rural India.
 Analyze the user's health query or myth carefully.
 
@@ -47,7 +60,7 @@ Hindi: [Simple, natural Hindi translation of the advice in Devanagari script, 2-
         const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${GROQ_API_KEY}`,
+                'Authorization': `Bearer ${apiKey}`,
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
@@ -65,7 +78,7 @@ Hindi: [Simple, natural Hindi translation of the advice in Devanagari script, 2-
             const fallbackRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${GROQ_API_KEY}`,
+                    'Authorization': `Bearer ${apiKey}`,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
@@ -77,6 +90,7 @@ Hindi: [Simple, natural Hindi translation of the advice in Devanagari script, 2-
                     temperature: 0.2
                 })
             });
+
 
             if (!fallbackRes.ok) {
                 const errData = await fallbackRes.text();
