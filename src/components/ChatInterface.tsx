@@ -1,14 +1,8 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Paperclip, Mic, Phone, CheckCircle2, AlertTriangle, X, Bot } from "lucide-react";
+import { Send, CheckCircle2, X, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { supabase } from "@/integrations/supabase/client";
-import { createClient } from "@supabase/supabase-js";
 import { cn } from "@/lib/utils";
-
-// Hardcoded client for Chatbot only (as per specific user request)
-const CHAT_SUPABASE_URL = "https://ymcejzgkvlxepjaihqzs.supabase.co";
-const CHAT_SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltY2Vqemdrdmx4ZXBqYWlocXpzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE5OTEwNDUsImV4cCI6MjA3NzU2NzA0NX0.hn6zvDSSvg0Nn5vCyzia-bEOwChxrY88V53dCm5Jek4";
-const chatSupabase = createClient(CHAT_SUPABASE_URL, CHAT_SUPABASE_KEY);
+import { askHealthChatbot } from "@/services/ChatService";
 
 interface Message {
     id: string;
@@ -26,8 +20,8 @@ export const ChatInterface = ({ onClose }: ChatInterfaceProps) => {
     const [messages, setMessages] = useState<Message[]>([
         {
             id: '1',
-            textEn: "Namaste! I am Sehat Saathi. Tell me your health problem.",
-            textHi: "नमस्ते! मैं सेहत साथी हूँ। मुझे अपनी स्वास्थ्य समस्या बताएं।",
+            textEn: "Namaste! I am Sehat Saathi. Tell me your health problem or ask about any health myth.",
+            textHi: "नमस्ते! मैं सेहत साथी हूँ। मुझे अपनी स्वास्थ्य समस्या बताएं या किसी स्वास्थ्य मिथक के बारे में पूछें।",
             sender: 'bot',
             timestamp: new Date()
         }
@@ -44,22 +38,6 @@ export const ChatInterface = ({ onClose }: ChatInterfaceProps) => {
         scrollToBottom();
     }, [messages, isTyping]);
 
-    const parseResponse = (text: string): { status?: 'TRUE' | 'FALSE'; english?: string; hindi?: string } => {
-        const cleanText = text.replace(/\*\*/g, '');
-
-        const statusMatch = cleanText.match(/(?:Status|Verdict):\s*(.*?)(?:\n|$)/i);
-        const englishMatch = cleanText.match(/English:\s*([\s\S]*?)(?=\n\s*Hindi:|$)/i);
-        const hindiMatch = cleanText.match(/Hindi:\s*([\s\S]*?)$/i);
-
-        const statusText = statusMatch?.[1]?.toLowerCase() || '';
-
-        return {
-            status: statusText.includes('true') ? 'TRUE' : statusText.includes('false') ? 'FALSE' : undefined,
-            english: englishMatch?.[1]?.trim(),
-            hindi: hindiMatch?.[1]?.trim(),
-        };
-    };
-
     const handleSend = async () => {
         if (!input.trim()) return;
 
@@ -75,30 +53,23 @@ export const ChatInterface = ({ onClose }: ChatInterfaceProps) => {
         setIsTyping(true);
 
         try {
-            const { data, error } = await chatSupabase.functions.invoke('health-chat', {
-                body: { message: userMsg.textEn }
-            });
-
-            if (error) throw error;
-
-            const aiText = data.reply;
-            const parsed = parseResponse(aiText);
+            const reply = await askHealthChatbot(userMsg.textEn);
 
             const botMsg: Message = {
                 id: (Date.now() + 1).toString(),
-                textEn: parsed.english || aiText, // Fallback to full text if parse fails
-                textHi: parsed.hindi,
+                textEn: reply.english || reply.rawText,
+                textHi: reply.hindi,
                 sender: 'bot',
                 timestamp: new Date()
             };
 
             setMessages(prev => [...prev, botMsg]);
         } catch (error) {
-            console.error("Error:", error);
+            console.error("Error in health chat:", error);
             const errorMsg: Message = {
                 id: (Date.now() + 1).toString(),
-                textEn: `Error: ${error instanceof Error ? error.message : "Unknown error"}. Check console for details.`,
-                textHi: "त्रुटि: कृपया कंसोल जांचें।",
+                textEn: `Error: ${error instanceof Error ? error.message : "Service unavailable"}. Please try again.`,
+                textHi: "त्रुटि: सेवा से जुड़ने में समस्या हुई। कृपया पुनः प्रयास करें।",
                 sender: 'bot',
                 timestamp: new Date()
             };
@@ -120,8 +91,9 @@ export const ChatInterface = ({ onClose }: ChatInterfaceProps) => {
                         <h3 className="font-semibold text-lg leading-none">Sehat Saathi Bot</h3>
                         <CheckCircle2 className="w-4 h-4 text-blue-200 fill-blue-500" />
                     </div>
-                    <p className="text-xs text-white/80">Running on Gemini 1.5 Flash</p>
+                    <p className="text-xs text-white/80">AI Health Assistant (Groq Ultra-Fast)</p>
                 </div>
+
                 {onClose && (
                     <Button variant="ghost" size="icon" className="text-white hover:bg-white/10" onClick={onClose}>
                         <X className="w-5 h-5" />

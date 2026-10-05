@@ -18,53 +18,68 @@ serve(async (req: Request) => {
     const { message } = await req.json();
     console.log('Processing message:', message);
 
-    // IMPORTANT: In production, use Deno.env.get('GEMINI_API_KEY')
-    // For now, using the provided key to fix the immediate issue.
-    // GUIDANCE: Move this to Supabase Secrets before pushing to public repo!
-    const API_KEY = Deno.env.get('GEMINI_API_KEY') || "AIzaSyAW5nirXbPJfzvGs6gPc-PXTqSRU47GgSI";
+    const GROQ_API_KEY = Deno.env.get('GROQ_API_KEY') || "";
+    const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
 
-    if (!API_KEY) {
-      throw new Error('GEMINI_API_KEY is not set');
-    }
-
-    const systemPrompt = `You are a medical myth-busting expert for rural India. 
+    const systemPrompt = `You are a medical myth-busting and health advisory expert for rural India named Sehat Saathi. 
     Analyze the following user query about health.
     
     Output Format strictly:
-    Status: [TRUE if true/beneficial, FALSE if myth/harmful]
-    English: [Simple english explanation, max 2 sentences]
-    Hindi: [Hindi translation of the explanation, simple language]
+    Status: [TRUE if true/beneficial, FALSE if myth/harmful, or ADVICE if general inquiry]
+    English: [Simple english explanation, max 2-3 sentences]
+    Hindi: [Hindi translation of the explanation in Devanagari script, max 2-3 sentences]
 
     Query: ${message}`;
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`,
-      {
+    let aiReply = "";
+
+    if (GROQ_API_KEY) {
+      const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: {
+          'Authorization': `Bearer ${GROQ_API_KEY}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          contents: [{
-            parts: [{ text: systemPrompt }]
-          }]
+          model: 'openai/gpt-oss-120b',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: message }
+          ],
+          temperature: 0.2
         })
+      });
+
+      if (groqRes.ok) {
+        const groqData = await groqRes.json();
+        aiReply = groqData.choices?.[0]?.message?.content || "";
       }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      console.error("Gemini API Error:", data);
-      throw new Error(data.error?.message || "Failed to fetch from Gemini");
     }
 
-    const aiReply = data.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, I could not understand that.";
+    if (!aiReply && GEMINI_API_KEY) {
+      const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contents: [{ parts: [{ text: systemPrompt }] }] })
+        }
+      );
+      if (response.ok) {
+        const data = await response.json();
+        aiReply = data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+      }
+    }
+
+    if (!aiReply) {
+      aiReply = "Status: ADVICE\nEnglish: I could not process your request right now. Please consult a doctor.\nHindi: मैं अभी आपका अनुरोध संसाधित नहीं कर सका। कृपया डॉक्टर से सलाह लें।";
+    }
 
     return new Response(
       JSON.stringify({ reply: aiReply }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
+
 
   } catch (error: any) {
     console.error('Error in health-chat function:', error);
